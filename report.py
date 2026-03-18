@@ -162,7 +162,7 @@ def send_to_feishu(report, week_num, week_range):
                     {
                         "tag": "note",
                         "elements": [{"tag": "plain_text",
-                            "content": f"🤖 Gemini AI + Google Search 实时生成 · {today.strftime('%Y-%m-%d %H:%M')} (北京时间)"}]
+                            "content": f"🤖 Gemini AI + Google Search 实时生成 · {datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')} (北京时间)"}
                     }
                 ]
             }
