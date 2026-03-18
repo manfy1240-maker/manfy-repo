@@ -33,7 +33,7 @@ def generate_report():
 3. 每条信息必须附上来源（媒体名称 + 发布日期），格式：【来源：XXX，XXXX年XX月XX日】
 4. 无法找到可靠来源的内容不得编造，直接注明"未检索到可靠信息"
 5. 【重要】本报告聚焦娱乐直播场景，包括：视频娱乐直播、语音直播、陪伴直播、才艺直播、游戏直播、语音房、PK直播等
-6. 【重要】严格剔除以下内容，不得纳入报告：电商直播、带货直播、购物直播、商品推广、品牌合作带货、直播间购物车、直播卖货等一切与电商变现相关的内容
+6. 【重要】优先选取纯娱乐直播动态。若该动态涉及电商变现（如带货）类内容，请仅提取其功能层面的创新点，忽略商品交易数据，电商变现（如带货）类内容包括：电商直播、带货直播、购物直播、商品推广、品牌合作带货、直播间购物车、直播卖货等一切与电商变现相关的内容
 
 请按以下结构输出报告：
 
@@ -104,6 +104,15 @@ def generate_report():
             tools=[types.Tool(google_search=types.GoogleSearch())]
         )
     )
+
+    # 调试：打印搜索查询
+    try:
+        for candidate in response.candidates:
+            if hasattr(candidate, 'grounding_metadata') and candidate.grounding_metadata:
+                print(f"DEBUG 搜索查询：{candidate.grounding_metadata.search_entry_point}")
+                print(f"DEBUG 引用来源数量：{len(candidate.grounding_metadata.grounding_chunks)}")
+    except Exception as e:
+        print(f"DEBUG 无搜索数据：{e}")
 
     report_text = response.text
 
