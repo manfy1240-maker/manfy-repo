@@ -1,6 +1,7 @@
 from google import genai
 from google.genai import types
 import requests
+import re
 import os
 from datetime import datetime, timezone, timedelta
 
@@ -12,6 +13,18 @@ PLATFORMS = [
     "微信视频号直播", "虎牙直播", "YY直播", "荔枝FM", "氧气语音"
 ]
 
+def clean_for_feishu(text):
+    """清洗格式适配飞书，同时去除 grounding 乱码"""
+    # 去除 Gemini grounding 注入的乱码（base64类随机字符串段落）
+    text = re.sub(r'\n[A-Za-z0-9+/=_\-]{30,}\n', '\n', text)
+    # 去除行内乱码（连续30个以上无意义字符）
+    text = re.sub(r'[A-Za-z0-9+/=]{40,}', '', text)
+    # ## 标题 → **加粗**
+    text = re.sub(r'^#{1,3}\s+(.+)$', r'**\1**', text, flags=re.MULTILINE)
+    # 压缩多余空行
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    return text.strip()
+
 def generate_report():
     client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -22,7 +35,6 @@ def generate_report():
     week_num = today.strftime("%Y年第%W周")
     platforms_str = "、".join(PLATFORMS)
     date_start = last_week.strftime('%Y-%m-%d')
-    date_end = today.strftime('%Y-%m-%d')
     month_str = today.strftime('%Y年%m月')
 
     prompt = f"""你是一位专业的娱乐直播行业分析师。
@@ -34,7 +46,7 @@ def generate_report():
 1. 【强制前置搜索令】：在执行搜索时，必须将查询词构造为：
    '平台名' + '直播' + '{month_str}' 或 '平台名' + '直播新功能' + 'after:{date_start}'
    强制搜索引擎优先抓取本周快讯。
-   请务必识别搜索结果网页的**原始发布时间标签**，不要被文章内文提到的往期回顾日期误导。
+   请务必识别搜索结果网页的原始发布时间标签，不要被文章内文提到的往期回顾日期误导。
    如果无法确定发布日期，请标注'日期待核实'。
 
 2. 【分级采纳原则】：
@@ -53,7 +65,7 @@ def generate_report():
 
 ---
 
-请按以下结构输出报告，使用飞书支持的格式（**加粗**代替标题）：
+请按以下结构输出报告，只使用**加粗**和---分隔线，不要使用##标题：
 
 **📅 {week_num} 娱乐直播竞品周报（{week_range}）**
 
@@ -62,7 +74,7 @@ def generate_report():
 **🆕 一、新功能动态速览**
 分平台列出娱乐直播场景新功能（电商功能不纳入）
 格式：**平台名**：功能描述【来源：XXX，日期】
-若本周无动态：标注"本周暂无最新动态"，并补充一条近期最重要动作【本周：补录动态】
+若本周无动态：标注"本周暂无最新动态"，并补充近期最重要动作【本周：补录动态】
 
 ---
 
@@ -94,7 +106,6 @@ AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电
 
 输出要求：语言专业简洁，重要信息加粗，适合企业内部阅读。"""
 
-    # 优先用 Pro，失败自动降级到 Flash
     response = None
     for model_name in ['gemini-2.5-pro-preview-03-25', 'gemini-2.5-pro', 'gemini-2.5-flash']:
         try:
@@ -122,18 +133,22 @@ AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电
     except Exception as e:
         print(f"DEBUG 无搜索数据：{e}")
 
-    report_text = response.text
+    # 清洗正文格式
+    report_text = clean_for_feishu(response.text)
 
-    # 提取来源：展示标题 + 可点击链接，最多15条
+    # 提取来源：优先用标题，没有标题则跳过纯域名条目
     sources = []
     try:
         for candidate in response.candidates:
             if hasattr(candidate, 'grounding_metadata') and candidate.grounding_metadata:
                 for chunk in candidate.grounding_metadata.grounding_chunks:
                     if hasattr(chunk, 'web') and chunk.web:
-                        title = chunk.web.title if chunk.web.title else "未知来源"
+                        title = chunk.web.title if chunk.web.title else ""
                         uri = chunk.web.uri if chunk.web.uri else ""
-                        if uri:
+                        # 只保留有完整标题的来源，过滤纯域名
+                        if uri and title and len(title) > 5 and "." not in title:
+                            sources.append((title, uri))
+                        elif uri and title and len(title) > 10:
                             sources.append((title, uri))
     except Exception:
         pass
@@ -147,12 +162,12 @@ AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电
                 unique_sources.append((title, uri))
         unique_sources = unique_sources[:15]
 
-        source_lines = []
-        for idx, (title, uri) in enumerate(unique_sources, 1):
-            source_lines.append(f"{idx}. [{title}]({uri})")
-
-        source_text = "\n\n---\n\n**🔗 本期信息来源**\n" + "\n".join(source_lines)
-        report_text += source_text
+        if unique_sources:
+            source_lines = []
+            for idx, (title, uri) in enumerate(unique_sources, 1):
+                source_lines.append(f"{idx}. [{title}]({uri})")
+            source_text = "\n\n---\n\n**🔗 本期信息来源**\n" + "\n".join(source_lines)
+            report_text += source_text
 
     return report_text, week_num, week_range
 
