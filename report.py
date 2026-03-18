@@ -111,8 +111,7 @@ AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电
                 model=model_name,
                 contents=prompt,
                 config=types.GenerateContentConfig(
-                    tools=[types.Tool(google_search=types.GoogleSearch())],
-                    max_output_tokens=1500
+                    tools=[types.Tool(google_search=types.GoogleSearch())],                   
                 )
             )
             print(f"✅ 模型 {model_name} 调用成功")
