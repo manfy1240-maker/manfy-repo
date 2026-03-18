@@ -33,7 +33,7 @@ def generate_report():
 3. 每条信息必须附上来源（媒体名称 + 发布日期），格式：【来源：XXX，XXXX年XX月XX日】
 4. 无法找到可靠来源的内容不得编造，直接注明"未检索到可靠信息"
 5. 【重要】本报告聚焦娱乐直播场景，包括：视频娱乐直播、语音直播、陪伴直播、才艺直播、游戏直播、语音房、PK直播等
-6. 【重要】优先选取纯娱乐直播动态。若该动态涉及电商变现（如带货）类内容，请仅提取其功能层面的创新点，忽略商品交易数据，电商变现（如带货）类内容包括：电商直播、带货直播、购物直播、商品推广、品牌合作带货、直播间购物车、直播卖货等一切与电商变现相关的内容
+6. 【重要】严格剔除以下内容，不得纳入报告：电商直播、带货直播、购物直播、商品推广、品牌合作带货、直播间购物车、直播卖货等一切与电商变现相关的内容
 
 请按以下结构输出报告：
 
@@ -90,11 +90,6 @@ def generate_report():
 
 ---
 
-## 六、📎 本期信息来源汇总
-列出本期报告引用的所有来源链接
-
----
-
 输出要求：语言专业简洁，适合企业内部报告，重要信息加粗标注。"""
 
     response = client.models.generate_content(
@@ -105,33 +100,39 @@ def generate_report():
         )
     )
 
-    # 调试：打印搜索查询
+    # 调试：打印搜索是否生效
     try:
         for candidate in response.candidates:
             if hasattr(candidate, 'grounding_metadata') and candidate.grounding_metadata:
-                print(f"DEBUG 搜索查询：{candidate.grounding_metadata.search_entry_point}")
                 print(f"DEBUG 引用来源数量：{len(candidate.grounding_metadata.grounding_chunks)}")
     except Exception as e:
         print(f"DEBUG 无搜索数据：{e}")
 
     report_text = response.text
 
-    # 提取 Google Search 引用来源
+    # 提取 Google Search 引用来源（最多10条，过滤跳转链接）
     sources = []
     try:
         for candidate in response.candidates:
             if hasattr(candidate, 'grounding_metadata') and candidate.grounding_metadata:
                 for chunk in candidate.grounding_metadata.grounding_chunks:
                     if hasattr(chunk, 'web') and chunk.web:
-                        sources.append(f"- {chunk.web.title}：{chunk.web.uri}")
+                        title = chunk.web.title if chunk.web.title else "未知来源"
+                        uri = chunk.web.uri if chunk.web.uri else ""
+                        if uri and "vertexaisearch" not in uri:
+                            sources.append(f"- {title}：{uri}")
+                        elif title and title not in [s.split("：")[0].replace("- ", "") for s in sources]:
+                            sources.append(f"- {title}")
     except Exception:
         pass
 
     if sources:
-        source_text = "\n\n---\n\n## 🔗 搜索引用来源\n" + "\n".join(set(sources))
+        unique_sources = list(dict.fromkeys(sources))[:10]
+        source_text = "\n\n---\n\n## 🔗 本期搜索来源（Top 10）\n" + "\n".join(unique_sources)
         report_text += source_text
 
     return report_text, week_num, week_range
+
 
 def send_to_feishu(report, week_num, week_range):
     max_len = 2800
@@ -169,12 +170,14 @@ def send_to_feishu(report, week_num, week_range):
             import time
             time.sleep(1)
 
+
 def main():
     print("🚀 开始生成娱乐直播竞品周报（含实时搜索）...")
     report, week_num, week_range = generate_report()
     print(f"✅ 报告生成完成，共 {len(report)} 字")
     send_to_feishu(report, week_num, week_range)
     print("📱 飞书推送完成！")
+
 
 if __name__ == "__main__":
     main()
