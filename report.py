@@ -21,44 +21,62 @@ def generate_report():
     week_range = f"{last_week.strftime('%Y年%m月%d日')}～{today.strftime('%Y年%m月%d日')}"
     week_num = today.strftime("%Y年第%W周")
     platforms_str = "、".join(PLATFORMS)
+    date_start = last_week.strftime('%Y-%m-%d')
+    date_end = today.strftime('%Y-%m-%d')
+    month_str = today.strftime('%Y年%m月')
 
     prompt = f"""你是一位专业的娱乐直播行业分析师。
-
 今天的日期是 {today.strftime('%Y年%m月%d日')}，本次报告统计周期为 {week_range}。
 
-请通过实时搜索，分别搜索以下每个平台的最新动态：{platforms_str}。
-搜索时在查询词中加入"{today.strftime('%Y年%m月')}"或"近期"等时间词，优先获取最新信息。
+---
+⚠️ 搜索与筛选执行策略（必须严格执行）：
+
+1. 【强制前置搜索令】：在执行搜索时，必须将查询词构造为：
+   '平台名' + '直播' + '{month_str}' 或 '平台名' + '直播新功能' + 'after:{date_start}'
+   强制搜索引擎优先抓取本周快讯。
+   请务必识别搜索结果网页的**原始发布时间标签**，不要被文章内文提到的往期回顾日期误导。
+   如果无法确定发布日期，请标注'日期待核实'。
+
+2. 【分级采纳原则】：
+   - 核心区（{last_week.strftime('%Y年%m月%d日')}～{today.strftime('%Y年%m月%d日')}）：全力搜集并详细阐释，这是报告的主体。
+   - 缓冲区（{today.strftime('%Y年%m月')}1日至今）：若本周无动态，可作为'近期回顾'少量补充，必须加注【本周：补录动态】。
+   - 严禁此范围之外：严禁出现在报告中，除非是重大的季度财报数据且在本周被媒体解读。
+
+3. 【防空置指令】：若某平台在本周确实无任何公开动态，请输出一份'行业本周大盘趋势观察'，而非直接返回空白。
+
+---
 
 调研平台：{platforms_str}
 
-要求：
-1. 优先采用 {last_week.strftime('%Y年%m月%d日')} 至 {today.strftime('%Y年%m月%d日')} 的信息，如该时间段内确实无信息，可采用最近1个月内的相关动态并注明日期
-2. 每条信息附上来源，格式：【来源：XXX，日期】
-3. 无法找到可靠来源的内容不得编造，注明"暂无可核实动态"
-4. 聚焦娱乐直播场景：视频娱乐直播、语音直播、陪伴直播、才艺直播、游戏直播、语音房、PK直播等
-5. 剔除电商带货、购物直播、商品推广等电商变现相关内容
-
-请按以下结构输出，使用飞书支持的格式（用**加粗**代替标题，用---分隔）：
+聚焦娱乐直播场景：视频娱乐直播、语音直播、陪伴直播、才艺直播、游戏直播、语音房、PK直播等。
+严格剔除：电商带货、购物直播、商品推广等电商变现相关内容。
 
 ---
+
+请按以下结构输出报告，使用飞书支持的格式（**加粗**代替标题）：
+
 **📅 {week_num} 娱乐直播竞品周报（{week_range}）**
+
 ---
 
 **🆕 一、新功能动态速览**
-分平台列出各平台在娱乐直播场景上线或测试的新功能（电商功能不纳入）
+分平台列出娱乐直播场景新功能（电商功能不纳入）
 格式：**平台名**：功能描述【来源：XXX，日期】
+若本周无动态：标注"本周暂无最新动态"，并补充一条近期最重要动作【本周：补录动态】
 
 ---
 
 **💰 二、娱乐直播营收玩法动态**
-梳理各平台娱乐直播营收动态，包括：打赏礼物更新、付费订阅变化、PK连麦商业化、主播激励政策
+打赏礼物更新、付费订阅变化、PK连麦商业化、主播激励政策（剔除电商带货内容）
 格式：**平台名**：营收动态描述【来源：XXX，日期】
+若本周无动态：标注"本周暂无最新动态"，并补充近期动向【本周：补录动态】
 
 ---
 
 **🤖 三、AI × 娱乐直播进展**
-聚焦各平台AI在娱乐直播的应用：AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等
+AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电商AI应用）
 格式：**平台名**：AI进展描述【来源：XXX，日期】
+若本周无动态：标注"本周暂无最新动态"，并补充近期动向【本周：补录动态】
 
 ---
 
@@ -76,14 +94,26 @@ def generate_report():
 
 输出要求：语言专业简洁，重要信息加粗，适合企业内部阅读。"""
 
-    # 升级为 gemini-2.5-pro 提升搜索质量
-    response = client.models.generate_content(
-        model='gemini-2.5-pro',
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            tools=[types.Tool(google_search=types.GoogleSearch())]
-        )
-    )
+    # 优先用 Pro，失败自动降级到 Flash
+    response = None
+    for model_name in ['gemini-2.5-pro-preview-03-25', 'gemini-2.5-pro', 'gemini-2.5-flash']:
+        try:
+            print(f"尝试使用模型：{model_name}")
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    tools=[types.Tool(google_search=types.GoogleSearch())]
+                )
+            )
+            print(f"✅ 模型 {model_name} 调用成功")
+            break
+        except Exception as e:
+            print(f"⚠️ 模型 {model_name} 失败：{e}，尝试降级...")
+            continue
+
+    if response is None:
+        raise Exception("所有模型均调用失败，请检查 API Key 或额度")
 
     try:
         for candidate in response.candidates:
@@ -94,7 +124,7 @@ def generate_report():
 
     report_text = response.text
 
-    # 提取来源：展示标题 + 日期 + 可点击链接
+    # 提取来源：展示标题 + 可点击链接，最多15条
     sources = []
     try:
         for candidate in response.candidates:
@@ -109,7 +139,6 @@ def generate_report():
         pass
 
     if sources:
-        # 去重保留前15条
         seen = set()
         unique_sources = []
         for title, uri in sources:
@@ -159,7 +188,7 @@ def send_to_feishu(report, week_num, week_range):
                         "elements": [
                             {
                                 "tag": "plain_text",
-                                "content": f"🤖 Gemini 2.5 Pro + Google Search 实时生成 · {now_beijing} (北京时间)"
+                                "content": f"🤖 Gemini AI + Google Search 实时生成 · {now_beijing} (北京时间)"
                             }
                         ]
                     }
