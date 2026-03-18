@@ -1,4 +1,5 @@
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import requests
 import os
 from datetime import datetime, timedelta
@@ -12,12 +13,7 @@ PLATFORMS = [
 ]
 
 def generate_report():
-    genai.configure(api_key=GEMINI_API_KEY)
-
-    model = genai.GenerativeModel(
-        model_name='gemini-2.5-flash',
-        tools='google_search'
-    )
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
     today = datetime.now()
     last_week = today - timedelta(days=7)
@@ -101,7 +97,13 @@ def generate_report():
 
 输出要求：语言专业简洁，适合企业内部报告，重要信息加粗标注。"""
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            tools=[types.Tool(google_search=types.GoogleSearch())]
+        )
+    )
 
     report_text = response.text
 
