@@ -76,8 +76,9 @@ def generate_report():
 
 输出要求：语言专业简洁，重要信息加粗，适合企业内部阅读。"""
 
+    # 升级为 gemini-2.5-pro 提升搜索质量
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model='gemini-2.5-pro',
         contents=prompt,
         config=types.GenerateContentConfig(
             tools=[types.Tool(google_search=types.GoogleSearch())]
@@ -93,6 +94,7 @@ def generate_report():
 
     report_text = response.text
 
+    # 提取来源：展示标题 + 日期 + 可点击链接
     sources = []
     try:
         for candidate in response.candidates:
@@ -101,16 +103,26 @@ def generate_report():
                     if hasattr(chunk, 'web') and chunk.web:
                         title = chunk.web.title if chunk.web.title else "未知来源"
                         uri = chunk.web.uri if chunk.web.uri else ""
-                        if uri and "vertexaisearch" not in uri:
-                            sources.append(f"- {title}：{uri}")
-                        elif title and title not in [s.split("：")[0].replace("- ", "") for s in sources]:
-                            sources.append(f"- {title}")
+                        if uri:
+                            sources.append((title, uri))
     except Exception:
         pass
 
     if sources:
-        unique_sources = list(dict.fromkeys(sources))[:10]
-        source_text = "\n\n---\n\n**🔗 本期搜索来源（Top 10）**\n" + "\n".join(unique_sources)
+        # 去重保留前15条
+        seen = set()
+        unique_sources = []
+        for title, uri in sources:
+            if title not in seen:
+                seen.add(title)
+                unique_sources.append((title, uri))
+        unique_sources = unique_sources[:15]
+
+        source_lines = []
+        for idx, (title, uri) in enumerate(unique_sources, 1):
+            source_lines.append(f"{idx}. [{title}]({uri})")
+
+        source_text = "\n\n---\n\n**🔗 本期信息来源**\n" + "\n".join(source_lines)
         report_text += source_text
 
     return report_text, week_num, week_range
@@ -147,7 +159,7 @@ def send_to_feishu(report, week_num, week_range):
                         "elements": [
                             {
                                 "tag": "plain_text",
-                                "content": f"🤖 Gemini AI + Google Search 实时生成 · {now_beijing} (北京时间)"
+                                "content": f"🤖 Gemini 2.5 Pro + Google Search 实时生成 · {now_beijing} (北京时间)"
                             }
                         ]
                     }
