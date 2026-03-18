@@ -15,7 +15,6 @@ PLATFORMS = [
 def generate_report():
     client = genai.Client(api_key=GEMINI_API_KEY)
 
-    # 使用北京时间
     beijing_tz = timezone(timedelta(hours=8))
     today = datetime.now(beijing_tz).replace(tzinfo=None)
     last_week = today - timedelta(days=7)
@@ -104,7 +103,6 @@ def generate_report():
         )
     )
 
-    # 调试：打印搜索是否生效
     try:
         for candidate in response.candidates:
             if hasattr(candidate, 'grounding_metadata') and candidate.grounding_metadata:
@@ -114,7 +112,6 @@ def generate_report():
 
     report_text = response.text
 
-    # 提取 Google Search 引用来源（最多10条，过滤跳转链接）
     sources = []
     try:
         for candidate in response.candidates:
@@ -139,12 +136,17 @@ def generate_report():
 
 
 def send_to_feishu(report, week_num, week_range):
+    beijing_tz = timezone(timedelta(hours=8))
+    now_beijing = datetime.now(beijing_tz).strftime('%Y-%m-%d %H:%M')
     max_len = 2800
     chunks = [report[i:i+max_len] for i in range(0, len(report), max_len)]
     total = len(chunks)
 
     for i, chunk in enumerate(chunks):
-        title = f"🎙️ 娱乐直播竞品周报 · {week_num}（{i+1}/{total}）" if total > 1 else f"🎙️ 娱乐直播竞品周报 · {week_num}"
+        if total > 1:
+            title = f"🎙️ 娱乐直播竞品周报 · {week_num}（{i+1}/{total}）"
+        else:
+            title = f"🎙️ 娱乐直播竞品周报 · {week_num}"
 
         payload = {
             "msg_type": "interactive",
@@ -161,8 +163,12 @@ def send_to_feishu(report, week_num, week_range):
                     {"tag": "hr"},
                     {
                         "tag": "note",
-                        "elements": [{"tag": "plain_text",
-                            "content": f"🤖 Gemini AI + Google Search 实时生成 · {datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M')} (北京时间)"}
+                        "elements": [
+                            {
+                                "tag": "plain_text",
+                                "content": f"🤖 Gemini AI + Google Search 实时生成 · {now_beijing} (北京时间)"
+                            }
+                        ]
                     }
                 ]
             }
