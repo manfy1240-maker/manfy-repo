@@ -17,7 +17,7 @@ jobs:
           python-version: '3.11'
 
       - name: 安装依赖
-        run: pip install google-generativeai requests
+        run: pip install google-genai requests
 
       - name: 执行报告生成
         env:
