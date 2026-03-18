@@ -16,7 +16,7 @@ def generate_report():
 
     model = genai.GenerativeModel(
         model_name='gemini-2.5-flash',
-        tools='google_search_retrieval'
+        tools='google_search'
     )
 
     today = datetime.now()
