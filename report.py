@@ -1,9 +1,9 @@
-import anthropic
+import google.generativeai as genai
 import requests
 import os
 from datetime import datetime, timedelta
 
-ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
+GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 FEISHU_WEBHOOK = os.environ["FEISHU_WEBHOOK"]
 
 PLATFORMS = [
@@ -12,7 +12,8 @@ PLATFORMS = [
 ]
 
 def generate_report():
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-2.5-flash')
 
     today = datetime.now()
     last_week = today - timedelta(days=7)
@@ -20,12 +21,7 @@ def generate_report():
     week_num = today.strftime("%Y年第%W周")
     platforms_str = "、".join(PLATFORMS)
 
-    response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=4000,
-        messages=[{
-            "role": "user",
-            "content": f"""你是一位专业的娱乐直播行业分析师。
+    prompt = f"""你是一位专业的娱乐直播行业分析师。
 
 请输出【{week_num}（{week_range}）娱乐直播平台竞品周报】
 
@@ -82,10 +78,9 @@ def generate_report():
 ---
 
 输出要求：语言专业简洁，适合企业内部报告，重要信息加粗标注。"""
-        }]
-    )
 
-    return response.content[0].text, week_num, week_range
+    response = model.generate_content(prompt)
+    return response.text, week_num, week_range
 
 def send_to_feishu(report, week_num, week_range):
     max_len = 2800
@@ -106,7 +101,7 @@ def send_to_feishu(report, week_num, week_range):
                     {"tag": "markdown", "content": f"**周期：{week_range}**\n\n{chunk}"},
                     {"tag": "hr"},
                     {"tag": "note", "elements": [{"tag": "plain_text",
-                        "content": f"🤖 由 Claude AI 自动生成 · {datetime.now().strftime('%Y-%m-%d %H:%M')}"}]}
+                        "content": f"🤖 由 Gemini AI 自动生成 · {datetime.now().strftime('%Y-%m-%d %H:%M')}"}]}
                 ]
             }
         }
