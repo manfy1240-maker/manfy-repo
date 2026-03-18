@@ -15,13 +15,9 @@ PLATFORMS = [
 
 def clean_for_feishu(text):
     """清洗格式适配飞书，同时去除 grounding 乱码"""
-    # 去除 Gemini grounding 注入的乱码（base64类随机字符串段落）
     text = re.sub(r'\n[A-Za-z0-9+/=_\-]{30,}\n', '\n', text)
-    # 去除行内乱码（连续30个以上无意义字符）
     text = re.sub(r'[A-Za-z0-9+/=]{40,}', '', text)
-    # ## 标题 → **加粗**
     text = re.sub(r'^#{1,3}\s+(.+)$', r'**\1**', text, flags=re.MULTILINE)
-    # 压缩多余空行
     text = re.sub(r'\n{3,}', '\n\n', text)
     return text.strip()
 
@@ -104,7 +100,8 @@ AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电
 
 ---
 
-输出要求：语言专业简洁，重要信息加粗，适合企业内部阅读。"""
+输出要求：语言专业简洁，重要信息加粗，适合企业内部阅读。
+⚠️ 字数控制：全文总字数严格控制在2000字以内，每个平台每条动态不超过50字，优先保留最重要的信息，删除冗余描述。"""
 
     response = None
     for model_name in ['gemini-2.5-pro-preview-03-25', 'gemini-2.5-pro', 'gemini-2.5-flash']:
@@ -114,7 +111,8 @@ AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电
                 model=model_name,
                 contents=prompt,
                 config=types.GenerateContentConfig(
-                    tools=[types.Tool(google_search=types.GoogleSearch())]
+                    tools=[types.Tool(google_search=types.GoogleSearch())],
+                    max_output_tokens=1500
                 )
             )
             print(f"✅ 模型 {model_name} 调用成功")
@@ -133,10 +131,8 @@ AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电
     except Exception as e:
         print(f"DEBUG 无搜索数据：{e}")
 
-    # 清洗正文格式
     report_text = clean_for_feishu(response.text)
 
-    # 提取来源：优先用标题，没有标题则跳过纯域名条目
     sources = []
     try:
         for candidate in response.candidates:
@@ -145,7 +141,6 @@ AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电
                     if hasattr(chunk, 'web') and chunk.web:
                         title = chunk.web.title if chunk.web.title else ""
                         uri = chunk.web.uri if chunk.web.uri else ""
-                        # 只保留有完整标题的来源，过滤纯域名
                         if uri and title and len(title) > 5 and "." not in title:
                             sources.append((title, uri))
                         elif uri and title and len(title) > 10:
