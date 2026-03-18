@@ -3,10 +3,13 @@ from google.genai import types
 import requests
 import re
 import os
+import json
 from datetime import datetime, timezone, timedelta
+from pathlib import Path
 
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 FEISHU_WEBHOOK = os.environ["FEISHU_WEBHOOK"]
+GITHUB_REPO = os.environ.get("GITHUB_REPO", "")
 
 PLATFORMS = [
     "抖音直播", "快手直播", "B站直播", "小红书直播",
@@ -14,12 +17,161 @@ PLATFORMS = [
 ]
 
 def clean_for_feishu(text):
-    """清洗格式适配飞书，同时去除 grounding 乱码"""
     text = re.sub(r'\n[A-Za-z0-9+/=_\-]{30,}\n', '\n', text)
     text = re.sub(r'[A-Za-z0-9+/=]{40,}', '', text)
     text = re.sub(r'^#{1,3}\s+(.+)$', r'**\1**', text, flags=re.MULTILINE)
     text = re.sub(r'\n{3,}', '\n\n', text)
     return text.strip()
+
+def markdown_to_html_content(text):
+    """简单转换 Markdown 为 HTML"""
+    # 加粗
+    text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+    # 分隔线
+    text = re.sub(r'^---$', '<hr>', text, flags=re.MULTILINE)
+    # 列表项
+    text = re.sub(r'^\* (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
+    text = re.sub(r'^- (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
+    # 数字列表
+    text = re.sub(r'^\d+\. (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
+    # 链接
+    text = re.sub(r'\[(.+?)\]\((https?://[^\)]+)\)', r'<a href="\2" target="_blank">\1</a>', text)
+    # 换行
+    text = text.replace('\n', '<br>')
+    return text
+
+def generate_html_report(report_text, week_num, week_range, sources):
+    """生成美观的 HTML 报告"""
+    now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y年%m月%d日 %H:%M')
+    html_content = markdown_to_html_content(report_text)
+
+    sources_html = ""
+    if sources:
+        sources_items = ""
+        for idx, (title, uri) in enumerate(sources[:15], 1):
+            sources_items += f'<li><a href="{uri}" target="_blank">{title}</a></li>'
+        sources_html = f"""
+        <div class="sources">
+            <h3>🔗 本期信息来源</h3>
+            <ol>{sources_items}</ol>
+        </div>"""
+
+    html = f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{week_num} 娱乐直播竞品周报</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.8;
+        }}
+        .header {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }}
+        .header h1 {{ font-size: 28px; margin-bottom: 8px; }}
+        .header .meta {{ font-size: 14px; opacity: 0.85; }}
+        .badge {{
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-top: 8px;
+        }}
+        .container {{
+            max-width: 860px;
+            margin: 30px auto;
+            padding: 0 16px 60px;
+        }}
+        .card {{
+            background: white;
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }}
+        .report-content {{
+            font-size: 15px;
+            line-height: 1.9;
+        }}
+        .report-content strong {{
+            color: #5b4fcf;
+            font-weight: 600;
+        }}
+        .report-content hr {{
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 20px 0;
+        }}
+        .report-content li {{
+            margin: 6px 0 6px 20px;
+            list-style: disc;
+        }}
+        .report-content a {{
+            color: #667eea;
+            text-decoration: none;
+        }}
+        .report-content a:hover {{ text-decoration: underline; }}
+        .sources {{
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin-top: 24px;
+        }}
+        .sources h3 {{
+            font-size: 15px;
+            color: #5b4fcf;
+            margin-bottom: 12px;
+        }}
+        .sources ol {{
+            padding-left: 20px;
+        }}
+        .sources li {{
+            margin: 6px 0;
+            font-size: 13px;
+        }}
+        .sources a {{
+            color: #667eea;
+            text-decoration: none;
+            word-break: break-all;
+        }}
+        .sources a:hover {{ text-decoration: underline; }}
+        .footer {{
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            margin-top: 20px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎙️ 娱乐直播竞品周报</h1>
+        <div class="meta">统计周期：{week_range}</div>
+        <div class="badge">🤖 Gemini AI + Google Search 实时生成</div>
+    </div>
+    <div class="container">
+        <div class="card">
+            <div class="report-content">
+                {html_content}
+            </div>
+            {sources_html}
+        </div>
+        <div class="footer">
+            生成时间：{now}（北京时间）· 由 Gemini AI 自动生成，请核实重要信息
+        </div>
+    </div>
+</body>
+</html>"""
+    return html
 
 def generate_report():
     client = genai.Client(api_key=GEMINI_API_KEY)
@@ -111,7 +263,7 @@ AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电
                 model=model_name,
                 contents=prompt,
                 config=types.GenerateContentConfig(
-                    tools=[types.Tool(google_search=types.GoogleSearch())],                   
+                    tools=[types.Tool(google_search=types.GoogleSearch())]
                 )
             )
             print(f"✅ 模型 {model_name} 调用成功")
@@ -132,6 +284,7 @@ AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电
 
     report_text = clean_for_feishu(response.text)
 
+    # 提取来源
     sources = []
     try:
         for candidate in response.candidates:
@@ -147,76 +300,95 @@ AI主播/数字人、AI变声美颜、AI弹幕互动、AIGC工具等（剔除电
     except Exception:
         pass
 
-    if sources:
-        seen = set()
-        unique_sources = []
-        for title, uri in sources:
-            if title not in seen:
-                seen.add(title)
-                unique_sources.append((title, uri))
-        unique_sources = unique_sources[:15]
+    seen = set()
+    unique_sources = []
+    for title, uri in sources:
+        if title not in seen:
+            seen.add(title)
+            unique_sources.append((title, uri))
+    unique_sources = unique_sources[:15]
 
-        if unique_sources:
-            source_lines = []
-            for idx, (title, uri) in enumerate(unique_sources, 1):
-                source_lines.append(f"{idx}. [{title}]({uri})")
-            source_text = "\n\n---\n\n**🔗 本期信息来源**\n" + "\n".join(source_lines)
-            report_text += source_text
+    # 生成并保存 HTML 报告
+    html = generate_html_report(report_text, week_num, week_range, unique_sources)
+    docs_dir = Path("docs")
+    docs_dir.mkdir(exist_ok=True)
+    html_path = docs_dir / "index.html"
+    html_path.write_text(html, encoding='utf-8')
+    print(f"✅ HTML 报告已保存：{html_path}")
 
-    return report_text, week_num, week_range
+    # 生成 GitHub Pages 链接
+    if GITHUB_REPO:
+        owner, repo = GITHUB_REPO.split('/')
+        report_url = f"https://{owner}.github.io/{repo}/"
+    else:
+        report_url = ""
+
+    return report_text, week_num, week_range, unique_sources, report_url
 
 
-def send_to_feishu(report, week_num, week_range):
+def send_to_feishu(summary, week_num, week_range, sources, report_url):
     beijing_tz = timezone(timedelta(hours=8))
     now_beijing = datetime.now(beijing_tz).strftime('%Y-%m-%d %H:%M')
-    max_len = 2800
-    chunks = [report[i:i+max_len] for i in range(0, len(report), max_len)]
-    total = len(chunks)
 
-    for i, chunk in enumerate(chunks):
-        if total > 1:
-            title = f"🎙️ 娱乐直播竞品周报 · {week_num}（{i+1}/{total}）"
-        else:
-            title = f"🎙️ 娱乐直播竞品周报 · {week_num}"
+    # 提取前3条关键动态作为飞书摘要
+    lines = [l.strip() for l in summary.split('\n') if l.strip() and '---' not in l and '**📅' not in l]
+    preview_lines = [l for l in lines if '**' in l and '：' in l][:5]
+    preview_text = '\n'.join(preview_lines) if preview_lines else summary[:300]
 
-        payload = {
-            "msg_type": "interactive",
-            "card": {
-                "header": {
-                    "title": {"tag": "plain_text", "content": title},
-                    "template": "purple"
-                },
-                "elements": [
-                    {
-                        "tag": "markdown",
-                        "content": f"**统计周期：{week_range}**\n\n{chunk}"
-                    },
-                    {"tag": "hr"},
-                    {
-                        "tag": "note",
-                        "elements": [
-                            {
-                                "tag": "plain_text",
-                                "content": f"🤖 Gemini AI + Google Search 实时生成 · {now_beijing} (北京时间)"
-                            }
-                        ]
-                    }
-                ]
+    # 构造飞书卡片：摘要 + 链接按钮
+    elements = [
+        {
+            "tag": "markdown",
+            "content": f"**统计周期：{week_range}**\n\n**📌 本周核心动态速览**\n\n{preview_text}"
+        },
+        {"tag": "hr"}
+    ]
+
+    # 添加报告链接按钮
+    if report_url:
+        elements.append({
+            "tag": "action",
+            "actions": [
+                {
+                    "tag": "button",
+                    "text": {"tag": "plain_text", "content": "📄 查看完整 HTML 报告"},
+                    "type": "primary",
+                    "url": report_url
+                }
+            ]
+        })
+
+    elements.append({
+        "tag": "note",
+        "elements": [
+            {
+                "tag": "plain_text",
+                "content": f"🤖 Gemini AI + Google Search 实时生成 · {now_beijing} (北京时间)"
             }
-        }
-        resp = requests.post(FEISHU_WEBHOOK, json=payload)
-        print(f"第{i+1}段推送结果：{resp.json()}")
+        ]
+    })
 
-        if total > 1:
-            import time
-            time.sleep(1)
+    payload = {
+        "msg_type": "interactive",
+        "card": {
+            "header": {
+                "title": {"tag": "plain_text", "content": f"🎙️ 娱乐直播竞品周报 · {week_num}"},
+                "template": "purple"
+            },
+            "elements": elements
+        }
+    }
+
+    resp = requests.post(FEISHU_WEBHOOK, json=payload)
+    print(f"飞书推送结果：{resp.json()}")
 
 
 def main():
     print("🚀 开始生成娱乐直播竞品周报（含实时搜索）...")
-    report, week_num, week_range = generate_report()
-    print(f"✅ 报告生成完成，共 {len(report)} 字")
-    send_to_feishu(report, week_num, week_range)
+    report_text, week_num, week_range, sources, report_url = generate_report()
+    print(f"✅ 报告生成完成，共 {len(report_text)} 字")
+    print(f"📎 报告链接：{report_url}")
+    send_to_feishu(report_text, week_num, week_range, sources, report_url)
     print("📱 飞书推送完成！")
 
 
