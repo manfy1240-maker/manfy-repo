@@ -2,7 +2,7 @@ from google import genai
 from google.genai import types
 import requests
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 FEISHU_WEBHOOK = os.environ["FEISHU_WEBHOOK"]
@@ -15,7 +15,9 @@ PLATFORMS = [
 def generate_report():
     client = genai.Client(api_key=GEMINI_API_KEY)
 
-    today = datetime.now()
+    # 使用北京时间
+    beijing_tz = timezone(timedelta(hours=8))
+    today = datetime.now(beijing_tz).replace(tzinfo=None)
     last_week = today - timedelta(days=7)
     week_range = f"{last_week.strftime('%Y年%m月%d日')}～{today.strftime('%Y年%m月%d日')}"
     week_num = today.strftime("%Y年第%W周")
@@ -23,12 +25,14 @@ def generate_report():
 
     prompt = f"""你是一位专业的娱乐直播行业分析师。
 
-请通过实时搜索，输出【{week_num}（{week_range}）娱乐直播平台竞品周报】
+今天的日期是 {today.strftime('%Y年%m月%d日')}，本次报告统计周期为 {week_range}。
+
+请通过实时搜索输出本期娱乐直播平台竞品周报。搜索时必须在每个查询词中加入明确的时间限定词（如"{today.strftime('%Y年%m月')}""近7天""本周"等），确保检索结果严格限定在统计周期内。
 
 调研平台：{platforms_str}
 
 ⚠️ 严格要求：
-1. 所有信息必须来自 {last_week.strftime('%Y年%m月%d日')} 至 {today.strftime('%Y年%m月%d日')} 期间的公开报道
+1. 所有信息必须来自 {last_week.strftime('%Y年%m月%d日')} 至 {today.strftime('%Y年%m月%d日')} 期间的公开报道，请在搜索时主动加入日期限定词筛选
 2. 超出该时间范围的信息一律不采用，标注"本周暂无可核实的最新动态"
 3. 每条信息必须附上来源（媒体名称 + 发布日期），格式：【来源：XXX，XXXX年XX月XX日】
 4. 无法找到可靠来源的内容不得编造，直接注明"未检索到可靠信息"
@@ -158,7 +162,7 @@ def send_to_feishu(report, week_num, week_range):
                     {
                         "tag": "note",
                         "elements": [{"tag": "plain_text",
-                            "content": f"🤖 Gemini AI + Google Search 实时生成 · {datetime.now().strftime('%Y-%m-%d %H:%M')}"}]
+                            "content": f"🤖 Gemini AI + Google Search 实时生成 · {today.strftime('%Y-%m-%d %H:%M')} (北京时间)"}]
                     }
                 ]
             }
