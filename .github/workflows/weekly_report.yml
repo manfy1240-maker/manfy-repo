@@ -1,0 +1,26 @@
+name: 娱乐直播竞品周报
+
+on:
+  schedule:
+    - cron: '0 1 * * 1'   # 每周一北京时间09:00自动执行
+  workflow_dispatch:        # 支持手动触发
+
+jobs:
+  run-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 安装Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 安装依赖
+        run: pip install google-generativeai requests
+
+      - name: 执行报告生成
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+        run: python report.py
