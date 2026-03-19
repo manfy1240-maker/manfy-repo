@@ -14,10 +14,10 @@ jobs:
   run-report:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
 
       - name: 安装Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.4.0
         with:
           python-version: '3.11'
 
@@ -41,7 +41,7 @@ jobs:
           git push
 
       - name: 上传Pages构建产物
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v3.0.1
         with:
           path: './docs'
 
@@ -54,4 +54,4 @@ jobs:
     steps:
       - name: 部署到GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4.0.5
