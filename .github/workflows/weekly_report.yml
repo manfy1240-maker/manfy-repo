@@ -32,15 +32,15 @@ jobs:
           GITHUB_REPO: ${{ github.repository }}
         run: python report.py
 
-      - name: 提交 docs 到仓库
+      - name: 提交docs到仓库
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/
-          git diff --staged --quiet || git commit -m "📊 更新竞品周报 $(date +'%Y-%m-%d')"
+          git diff --staged --quiet || git commit -m "update report"
           git push
 
-      - name: 上传 Pages 构建产物
+      - name: 上传Pages构建产物
         uses: actions/upload-pages-artifact@v3
         with:
           path: './docs'
@@ -51,4 +51,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    steps
+    steps:
+      - name: 部署到GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
