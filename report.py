@@ -1,5 +1,4 @@
-from google import genai
-from google.genai import types
+import anthropic
 import requests
 import re
 import os
@@ -7,7 +6,7 @@ import json
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
+ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 FEISHU_WEBHOOK = os.environ.get("FEISHU_WEBHOOK", "")
 FEISHU_WEBHOOKS = list(dict.fromkeys([
     wh for wh in [
@@ -41,14 +40,25 @@ def clean_for_feishu(text):
 
 
 def markdown_to_html_content(text):
+    # 加粗
     text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
-    text = re.sub(r'^---$', '<hr>', text, flags=re.MULTILINE)
-    text = re.sub(r'^\* (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
-    text = re.sub(r'^- (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
+    # 分隔线
+    text = re.sub(r'^---$', '<hr class="section-hr">', text, flags=re.MULTILINE)
+    # 无序列表
+    text = re.sub(r'^[\*\-] (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
+    # 有序列表
     text = re.sub(r'^\d+\. (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
+    # 链接
     text = re.sub(r'\[(.+?)\]\((https?://[^\)]+)\)', r'<a href="\2" target="_blank">\1</a>', text)
-    text = text.replace('\n', '<br>')
-    return text
+    # 换行
+    lines = text.split('\n')
+    result = []
+    for line in lines:
+        if line.startswith('<li>') or line.startswith('<hr') or line.strip() == '':
+            result.append(line)
+        else:
+            result.append(f'<p>{line}</p>' if line.strip() else '')
+    return '\n'.join(result)
 
 
 def generate_html_report(report_text, week_num, week_range, sources):
@@ -61,9 +71,9 @@ def generate_html_report(report_text, week_num, week_range, sources):
         for idx, (title, uri) in enumerate(sources[:15], 1):
             sources_items += f'<li><a href="{uri}" target="_blank">{title}</a></li>'
         sources_html = f"""
-        <div class="sources">
-            <h3>🔗 本期信息来源</h3>
-            <ol>{sources_items}</ol>
+        <div class="sources-box">
+            <div class="sources-title">🔗 本期信息来源</div>
+            <ol class="sources-list">{sources_items}</ol>
         </div>"""
 
     html = f"""<!DOCTYPE html>
@@ -73,86 +83,209 @@ def generate_html_report(report_text, week_num, week_range, sources):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{week_num} 娱乐直播竞品周报</title>
     <style>
+        :root {{
+            --primary: #6c63ff;
+            --primary-dark: #5a52d5;
+            --secondary: #764ba2;
+            --bg: #f4f5f9;
+            --card-bg: #ffffff;
+            --text: #2d2d2d;
+            --text-light: #888;
+            --border: #eaeaea;
+            --accent: #f0eeff;
+        }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: #f0f2f5;
-            color: #333;
-            line-height: 1.8;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.85;
+            font-size: 15px;
         }}
+
+        /* 顶部 Header */
         .header {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 40px 20px;
+            padding: 52px 24px 40px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }}
-        .header h1 {{ font-size: 28px; margin-bottom: 8px; }}
-        .header .meta {{ font-size: 14px; opacity: 0.85; }}
+        .header::before {{
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 220px; height: 220px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }}
+        .header::after {{
+            content: '';
+            position: absolute;
+            bottom: -80px; left: -40px;
+            width: 280px; height: 280px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }}
+        .header h1 {{
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }}
+        .header .period {{
+            font-size: 14px;
+            opacity: 0.88;
+            margin-bottom: 14px;
+        }}
+        .header-badges {{
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }}
         .badge {{
             display: inline-block;
-            background: rgba(255,255,255,0.2);
-            padding: 4px 12px;
+            background: rgba(255,255,255,0.18);
+            padding: 4px 14px;
             border-radius: 20px;
-            font-size: 13px;
-            margin-top: 8px;
+            font-size: 12px;
+            border: 1px solid rgba(255,255,255,0.25);
         }}
         .back-btn {{
             display: inline-block;
-            margin-top: 14px;
             background: rgba(255,255,255,0.15);
             color: white;
-            padding: 6px 16px;
+            padding: 7px 18px;
             border-radius: 20px;
             font-size: 13px;
             text-decoration: none;
             border: 1px solid rgba(255,255,255,0.3);
+            transition: background 0.2s;
         }}
-        .back-btn:hover {{ background: rgba(255,255,255,0.25); }}
+        .back-btn:hover {{ background: rgba(255,255,255,0.28); }}
+
+        /* 主体容器 */
         .container {{
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 0 16px 60px;
+            max-width: 920px;
+            margin: 32px auto;
+            padding: 0 18px 72px;
         }}
+
+        /* 卡片 */
         .card {{
-            background: white;
-            border-radius: 12px;
-            padding: 28px 32px;
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 32px 36px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
         }}
-        .report-content {{ font-size: 15px; line-height: 1.9; }}
-        .report-content strong {{ color: #5b4fcf; font-weight: 600; }}
-        .report-content hr {{ border: none; border-top: 1px solid #eee; margin: 20px 0; }}
-        .report-content li {{ margin: 6px 0 6px 20px; list-style: disc; }}
-        .report-content a {{ color: #667eea; text-decoration: none; }}
-        .report-content a:hover {{ text-decoration: underline; }}
-        .sources {{
-            background: #f8f9ff;
+
+        /* 报告正文 */
+        .report-content p {{
+            margin-bottom: 10px;
+            color: var(--text);
+        }}
+        .report-content p:empty {{ display: none; }}
+        .report-content strong {{
+            color: var(--primary-dark);
+            font-weight: 600;
+        }}
+        .report-content .section-hr {{
+            border: none;
+            border-top: 2px solid var(--accent);
+            margin: 28px 0;
+        }}
+        .report-content li {{
+            margin: 7px 0 7px 22px;
+            list-style: disc;
+            color: var(--text);
+        }}
+        .report-content a {{
+            color: var(--primary);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }}
+        .report-content a:hover {{ border-bottom-color: var(--primary); }}
+
+        /* 模块标题识别高亮 */
+        .report-content p strong:first-child {{
+            display: inline-block;
+        }}
+
+        /* 来源区域 */
+        .sources-box {{
+            background: var(--accent);
             border-radius: 10px;
             padding: 20px 24px;
-            margin-top: 24px;
+            margin-top: 28px;
+            border-left: 4px solid var(--primary);
         }}
-        .sources h3 {{ font-size: 15px; color: #5b4fcf; margin-bottom: 12px; }}
-        .sources ol {{ padding-left: 20px; }}
-        .sources li {{ margin: 6px 0; font-size: 13px; }}
-        .sources a {{ color: #667eea; text-decoration: none; word-break: break-all; }}
-        .footer {{ text-align: center; color: #999; font-size: 13px; margin-top: 20px; }}
+        .sources-title {{
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+        }}
+        .sources-list {{
+            padding-left: 20px;
+        }}
+        .sources-list li {{
+            margin: 7px 0;
+            font-size: 13px;
+            color: var(--text-light);
+            list-style: decimal;
+        }}
+        .sources-list a {{
+            color: var(--primary);
+            text-decoration: none;
+            word-break: break-all;
+        }}
+        .sources-list a:hover {{ text-decoration: underline; }}
+
+        /* 底部 */
+        .footer {{
+            text-align: center;
+            color: var(--text-light);
+            font-size: 12px;
+            margin-top: 24px;
+            padding: 0 16px;
+        }}
+
+        /* 响应式 */
+        @media (max-width: 600px) {{
+            .card {{ padding: 20px 18px; }}
+            .header h1 {{ font-size: 22px; }}
+            .container {{ padding: 0 12px 60px; }}
+        }}
     </style>
 </head>
 <body>
     <div class="header">
         <h1>🎙️ 娱乐直播竞品周报</h1>
-        <div class="meta">统计周期：{week_range}</div>
-        <div class="badge">🤖 Gemini AI + Google Search 实时生成</div>
-        <br>
+        <div class="period">统计周期：{week_range}</div>
+        <div class="header-badges">
+            <span class="badge">🤖 Claude AI 生成</span>
+            <span class="badge">🔍 实时搜索增强</span>
+            <span class="badge">📊 双赛道分析</span>
+        </div>
         <a class="back-btn" href="./index.html">← 返回历史报告列表</a>
     </div>
+
     <div class="container">
         <div class="card">
-            <div class="report-content">{html_content}</div>
+            <div class="report-content">
+                {html_content}
+            </div>
             {sources_html}
         </div>
-        <div class="footer">生成时间：{now}（北京时间）· 由 Gemini AI 自动生成，请核实重要信息</div>
+        <div class="footer">
+            生成时间：{now}（北京时间）&nbsp;·&nbsp;
+            由 Claude Sonnet 4.6 + Web Search 自动生成，重要信息请以官方来源为准
+        </div>
     </div>
 </body>
 </html>"""
@@ -181,14 +314,14 @@ def update_index_page(docs_dir, week_num, week_range, filename):
     history_file.write_text(json.dumps(history, ensure_ascii=False, indent=2), encoding='utf-8')
 
     history_items = ""
-    for item in history:
+    for i, item in enumerate(history):
         is_latest = item["filename"] == filename
-        badge = '<span class="latest-badge">最新</span>' if is_latest else ''
+        badge = '<span class="latest-badge">最新</span>' if is_latest else f'<span class="issue-num">第 {len(history)-i} 期</span>'
         history_items += f"""
         <div class="report-item {'latest' if is_latest else ''}">
             <div class="report-info">
                 <div class="report-title">{item['week_num']} 娱乐直播竞品周报 {badge}</div>
-                <div class="report-meta">统计周期：{item['week_range']} · 生成于 {item['generated_at']}</div>
+                <div class="report-meta">📅 {item['week_range']} &nbsp;·&nbsp; 🕐 生成于 {item['generated_at']}</div>
             </div>
             <a class="view-btn" href="./{item['filename']}">查看报告 →</a>
         </div>"""
@@ -200,81 +333,153 @@ def update_index_page(docs_dir, week_num, week_range, filename):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>娱乐直播竞品周报 · 历史归档</title>
     <style>
+        :root {{
+            --primary: #6c63ff;
+            --secondary: #764ba2;
+            --bg: #f4f5f9;
+            --text: #2d2d2d;
+            --text-light: #999;
+            --accent: #f0eeff;
+        }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: #f0f2f5;
-            color: #333;
-            line-height: 1.8;
+            background: var(--bg);
+            color: var(--text);
         }}
         .header {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 48px 20px;
+            padding: 52px 24px 44px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }}
-        .header h1 {{ font-size: 30px; margin-bottom: 8px; }}
-        .header p {{ font-size: 14px; opacity: 0.85; }}
+        .header::before {{
+            content: '';
+            position: absolute;
+            top: -50px; right: -50px;
+            width: 200px; height: 200px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }}
+        .header h1 {{ font-size: 28px; font-weight: 700; margin-bottom: 10px; }}
+        .header p {{ font-size: 14px; opacity: 0.85; margin-bottom: 16px; }}
+        .header-stats {{
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }}
+        .stat-item {{
+            background: rgba(255,255,255,0.15);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }}
         .container {{
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 0 16px 60px;
+            max-width: 820px;
+            margin: 32px auto;
+            padding: 0 18px 72px;
         }}
         .section-title {{
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
-            color: #555;
+            color: #666;
             margin-bottom: 16px;
-            padding-left: 4px;
+            padding-left: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }}
         .report-item {{
             background: white;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 20px 24px;
             margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: box-shadow 0.2s;
+            gap: 16px;
+            transition: box-shadow 0.2s, transform 0.2s;
         }}
-        .report-item:hover {{ box-shadow: 0 4px 16px rgba(0,0,0,0.1); }}
-        .report-item.latest {{ border-left: 4px solid #667eea; }}
-        .report-title {{ font-size: 16px; font-weight: 600; color: #333; margin-bottom: 4px; }}
-        .report-meta {{ font-size: 13px; color: #999; }}
+        .report-item:hover {{
+            box-shadow: 0 6px 20px rgba(108,99,255,0.12);
+            transform: translateY(-1px);
+        }}
+        .report-item.latest {{
+            border-left: 4px solid var(--primary);
+            background: linear-gradient(to right, #faf9ff, white);
+        }}
+        .report-info {{ flex: 1; min-width: 0; }}
+        .report-title {{
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }}
+        .report-meta {{ font-size: 12px; color: var(--text-light); }}
         .latest-badge {{
-            display: inline-block;
-            background: #667eea;
+            background: var(--primary);
             color: white;
             font-size: 11px;
-            padding: 2px 8px;
+            padding: 2px 9px;
             border-radius: 10px;
-            margin-left: 8px;
-            vertical-align: middle;
+            font-weight: 500;
+        }}
+        .issue-num {{
+            background: var(--accent);
+            color: var(--primary);
+            font-size: 11px;
+            padding: 2px 9px;
+            border-radius: 10px;
         }}
         .view-btn {{
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 8px 18px;
+            padding: 8px 20px;
             border-radius: 20px;
             font-size: 13px;
             text-decoration: none;
             white-space: nowrap;
-            margin-left: 16px;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
         }}
-        .view-btn:hover {{ opacity: 0.9; }}
-        .footer {{ text-align: center; color: #bbb; font-size: 13px; margin-top: 30px; }}
+        .view-btn:hover {{ opacity: 0.88; }}
+        .footer {{
+            text-align: center;
+            color: var(--text-light);
+            font-size: 12px;
+            margin-top: 32px;
+        }}
+        @media (max-width: 600px) {{
+            .report-item {{ flex-direction: column; align-items: flex-start; }}
+            .view-btn {{ align-self: flex-end; }}
+        }}
     </style>
 </head>
 <body>
     <div class="header">
         <h1>🎙️ 娱乐直播竞品周报</h1>
         <p>娱乐直播 · 语音直播 · AI进展 · 每周自动更新</p>
+        <div class="header-stats">
+            <span class="stat-item">📚 共 {len(history)} 期报告</span>
+            <span class="stat-item">🤖 Claude AI 驱动</span>
+            <span class="stat-item">🔄 每周一自动更新</span>
+        </div>
     </div>
     <div class="container">
-        <div class="section-title">📚 历史报告归档（共 {len(history)} 期）</div>
+        <div class="section-title">📋 历史报告归档</div>
         {history_items}
-        <div class="footer">🤖 由 Gemini AI + Google Search 自动生成 · 每周一更新</div>
+        <div class="footer">
+            由 Claude Sonnet 4.6 + Web Search 自动生成 · 每周一北京时间 09:00 更新
+        </div>
     </div>
 </body>
 </html>"""
@@ -284,7 +489,7 @@ def update_index_page(docs_dir, week_num, week_range, filename):
 
 
 def generate_report():
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
     beijing_tz = timezone(timedelta(hours=8))
     today = datetime.now(beijing_tz).replace(tzinfo=None)
@@ -382,53 +587,33 @@ def generate_report():
 
 ---
 
-输出要求：语言专业简洁，重要数据加粗，适合企业内部阅读。
-⚠️ 字数控制：全文控制在3000字以内，每条动态不超过60字。"""
+输出要求：语言专业简洁，重要数据加粗，适合企业内部阅读。"""
 
-    response = None
-    for model_name in ['gemini-2.5-pro-preview-03-25', 'gemini-2.5-pro', 'gemini-2.5-flash']:
-        try:
-            print(f"尝试使用模型：{model_name}")
-            response = client.models.generate_content(
-                model=model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    tools=[types.Tool(google_search=types.GoogleSearch())]
-                )
-            )
-            print(f"✅ 模型 {model_name} 调用成功")
-            break
-        except Exception as e:
-            print(f"⚠️ 模型 {model_name} 失败：{e}，尝试降级...")
-            continue
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=8000,
+        tools=[{
+            "type": "web_search_20250305",
+            "name": "web_search"
+        }],
+        messages=[{"role": "user", "content": prompt}]
+    )
 
-    if response is None:
-        raise Exception("所有模型均调用失败")
+    # 提取文本内容
+    report_text = ""
+    for block in response.content:
+        if hasattr(block, 'text'):
+            report_text += block.text
 
-    try:
-        for candidate in response.candidates:
-            if hasattr(candidate, 'grounding_metadata') and candidate.grounding_metadata:
-                print(f"DEBUG 引用来源数量：{len(candidate.grounding_metadata.grounding_chunks)}")
-    except Exception as e:
-        print(f"DEBUG 无搜索数据：{e}")
+    report_text = clean_for_feishu(report_text)
+    print(f"✅ 报告生成完成，共 {len(report_text)} 字")
 
-    report_text = clean_for_feishu(response.text)
-
+    # Claude API 暂无 grounding metadata，来源从正文提取
     sources = []
-    try:
-        for candidate in response.candidates:
-            if hasattr(candidate, 'grounding_metadata') and candidate.grounding_metadata:
-                for chunk in candidate.grounding_metadata.grounding_chunks:
-                    if hasattr(chunk, 'web') and chunk.web:
-                        title = chunk.web.title if chunk.web.title else ""
-                        uri = chunk.web.uri if chunk.web.uri else ""
-                        if uri and title and len(title) > 5 and "." not in title:
-                            sources.append((title, uri))
-                        elif uri and title and len(title) > 10:
-                            sources.append((title, uri))
-    except Exception:
-        pass
-
+    url_pattern = re.findall(r'\[([^\]]+)\]\((https?://[^\)]+)\)', report_text)
+    for title, uri in url_pattern:
+        if len(title) > 5:
+            sources.append((title, uri))
     seen = set()
     unique_sources = []
     for title, uri in sources:
@@ -443,7 +628,7 @@ def generate_report():
 
     html = generate_html_report(report_text, week_num, week_range, unique_sources)
     (docs_dir / filename).write_text(html, encoding='utf-8')
-    print(f"✅ 本期 HTML 报告已保存：docs/{filename}")
+    print(f"✅ HTML 报告已保存：docs/{filename}")
 
     update_index_page(docs_dir, week_num, week_range, filename)
 
@@ -496,7 +681,7 @@ def send_to_feishu(summary, week_num, week_range, sources, report_url, index_url
     elements.append({
         "tag": "note",
         "elements": [{"tag": "plain_text",
-            "content": f"🤖 Gemini AI + Google Search 实时生成 · {now_beijing} (北京时间)"}]
+            "content": f"🤖 Claude Sonnet 4.6 + Web Search 实时生成 · {now_beijing} (北京时间)"}]
     })
 
     payload = {
@@ -515,9 +700,8 @@ def send_to_feishu(summary, week_num, week_range, sources, report_url, index_url
 
 
 def main():
-    print("🚀 开始生成娱乐直播竞品周报（含实时搜索）...")
+    print("🚀 开始生成娱乐直播竞品周报（Claude Sonnet 4.6）...")
     report_text, week_num, week_range, sources, report_url, index_url = generate_report()
-    print(f"✅ 报告生成完成，共 {len(report_text)} 字")
     print(f"📎 本期报告：{report_url}")
     print(f"📚 历史归档：{index_url}")
 
