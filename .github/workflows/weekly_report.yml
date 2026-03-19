@@ -27,11 +27,21 @@ jobs:
       - name: 执行报告生成
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+          FEISHU_WEBHOOK_1: ${{ secrets.FEISHU_WEBHOOK_1 }}
+          FEISHU_WEBHOOK_2: ${{ secrets.FEISHU_WEBHOOK_2 }}
+          FEISHU_WEBHOOK_3: ${{ secrets.FEISHU_WEBHOOK_3 }}
           GITHUB_REPO: ${{ github.repository }}
         run: python report.py
 
-      - name: 发布 HTML 报告到 GitHub Pages
+      - name: 提交 docs 到仓库
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git diff --staged --quiet || git commit -m "📊 更新竞品周报 $(date +'%Y-%m-%d')"
+          git push
+
+      - name: 上传 Pages 构建产物
         uses: actions/upload-pages-artifact@v3
         with:
           path: './docs'
