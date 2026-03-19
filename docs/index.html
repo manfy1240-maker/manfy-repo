@@ -5,135 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>娱乐直播竞品周报 · 历史归档</title>
     <style>
-        :root {
-            --primary: #6c63ff;
-            --secondary: #764ba2;
-            --bg: #f4f5f9;
-            --text: #2d2d2d;
-            --text-light: #999;
-            --accent: #f0eeff;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-        }
-        .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 52px 24px 44px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50px; right: -50px;
-            width: 200px; height: 200px;
-            background: rgba(255,255,255,0.06);
-            border-radius: 50%;
-        }
-        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
-        .header p { font-size: 14px; opacity: 0.85; margin-bottom: 16px; }
-        .header-stats {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .stat-item {
-            background: rgba(255,255,255,0.15);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .container {
-            max-width: 820px;
-            margin: 32px auto;
-            padding: 0 18px 72px;
-        }
-        .section-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 16px;
-            padding-left: 2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .report-item {
-            background: white;
-            border-radius: 14px;
-            padding: 20px 24px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            transition: box-shadow 0.2s, transform 0.2s;
-        }
-        .report-item:hover {
-            box-shadow: 0 6px 20px rgba(108,99,255,0.12);
-            transform: translateY(-1px);
-        }
-        .report-item.latest {
-            border-left: 4px solid var(--primary);
-            background: linear-gradient(to right, #faf9ff, white);
-        }
-        .report-info { flex: 1; min-width: 0; }
-        .report-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .report-meta { font-size: 12px; color: var(--text-light); }
-        .latest-badge {
-            background: var(--primary);
-            color: white;
-            font-size: 11px;
-            padding: 2px 9px;
-            border-radius: 10px;
-            font-weight: 500;
-        }
-        .issue-num {
-            background: var(--accent);
-            color: var(--primary);
-            font-size: 11px;
-            padding: 2px 9px;
-            border-radius: 10px;
-        }
-        .view-btn {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 13px;
-            text-decoration: none;
-            white-space: nowrap;
-            transition: opacity 0.2s;
-            flex-shrink: 0;
-        }
-        .view-btn:hover { opacity: 0.88; }
-        .footer {
-            text-align: center;
-            color: var(--text-light);
-            font-size: 12px;
-            margin-top: 32px;
-        }
-        @media (max-width: 600px) {
-            .report-item { flex-direction: column; align-items: flex-start; }
-            .view-btn { align-self: flex-end; }
-        }
+        :root{--p:#6c63ff;--ps:#764ba2;--bg:#f4f5f9;--text:#2d2d2d;--light:#999;--accent:#f0eeff}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text)}
+        .header{background:linear-gradient(135deg,var(--p),var(--ps));color:#fff;padding:52px 24px 44px;text-align:center}
+        .header h1{font-size:28px;font-weight:700;margin-bottom:10px}
+        .header p{font-size:14px;opacity:.85;margin-bottom:16px}
+        .header-stats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+        .stat{background:rgba(255,255,255,.15);padding:5px 16px;border-radius:20px;font-size:13px;border:1px solid rgba(255,255,255,.2)}
+        .container{max-width:820px;margin:32px auto;padding:0 18px 72px}
+        .section-title{font-size:15px;font-weight:600;color:#666;margin-bottom:16px}
+        .report-item{background:#fff;border-radius:14px;padding:20px 24px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);display:flex;align-items:center;justify-content:space-between;gap:16px;transition:all .2s}
+        .report-item:hover{box-shadow:0 6px 20px rgba(108,99,255,.12);transform:translateY(-1px)}
+        .report-item.latest{border-left:4px solid var(--p);background:linear-gradient(to right,#faf9ff,#fff)}
+        .report-info{flex:1;min-width:0}
+        .report-title{font-size:15px;font-weight:600;margin-bottom:5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+        .report-meta{font-size:12px;color:var(--light)}
+        .latest-badge{background:var(--p);color:#fff;font-size:11px;padding:2px 9px;border-radius:10px}
+        .issue-num{background:var(--accent);color:var(--p);font-size:11px;padding:2px 9px;border-radius:10px}
+        .view-btn{background:linear-gradient(135deg,var(--p),var(--ps));color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;text-decoration:none;white-space:nowrap;flex-shrink:0}
+        .view-btn:hover{opacity:.88}
+        .footer{text-align:center;color:var(--light);font-size:12px;margin-top:32px}
+        @media(max-width:600px){.report-item{flex-direction:column;align-items:flex-start}.view-btn{align-self:flex-end}}
     </style>
 </head>
 <body>
@@ -141,9 +34,9 @@
         <h1>🎙️ 娱乐直播竞品周报</h1>
         <p>娱乐直播 · 语音直播 · AI进展 · 每周自动更新</p>
         <div class="header-stats">
-            <span class="stat-item">📚 共 1 期报告</span>
-            <span class="stat-item">🤖 Claude AI 驱动</span>
-            <span class="stat-item">🔄 每周一自动更新</span>
+            <span class="stat">📚 共 1 期报告</span>
+            <span class="stat">🤖 Claude Sonnet 4.6</span>
+            <span class="stat">🔄 每周一自动更新</span>
         </div>
     </div>
     <div class="container">
@@ -152,13 +45,11 @@
         <div class="report-item latest">
             <div class="report-info">
                 <div class="report-title">2026年第11周 娱乐直播竞品周报 <span class="latest-badge">最新</span></div>
-                <div class="report-meta">📅 2026年03月12日～2026年03月19日 &nbsp;·&nbsp; 🕐 生成于 2026-03-19 14:12</div>
+                <div class="report-meta">📅 2026年03月12日～2026年03月19日 &nbsp;·&nbsp; 🕐 生成于 2026-03-19 15:24</div>
             </div>
             <a class="view-btn" href="./report_2026_11.html">查看报告 →</a>
         </div>
-        <div class="footer">
-            由 Claude Sonnet 4.6 + Web Search 自动生成 · 每周一北京时间 09:00 更新
-        </div>
+        <div class="footer">由 Claude Sonnet 4.6 + Web Search 自动生成 · 每周一北京时间 09:00 更新</div>
     </div>
 </body>
 </html>
