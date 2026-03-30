@@ -2,7 +2,8 @@ name: 娱乐直播竞品周报
 
 on:
   schedule:
-    - cron: '0 1 * * 1'
+    - cron: '0 23 * * 0'   # 周日UTC 23:00 = 周一北京时间07:00 执行报告
+    - cron: '0 0 * * 3'    # 每周三UTC 00:00 保活触发
   workflow_dispatch:
 
 permissions:
