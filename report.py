@@ -64,10 +64,8 @@ def md_to_html(text):
 def generate_html_report(report_text, week_num, week_range, sources):
     now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y年%m月%d日 %H:%M')
 
-    # 解析各章节内容
     sections = parse_sections(report_text)
 
-    # 生成各章节 HTML
     s1_html = render_section1(sections.get('insights', ''))
     s2_html = render_section2(sections.get('revenue', ''))
     s3_html = render_section3(sections.get('ai', ''))
@@ -213,7 +211,7 @@ body{{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHe
   <h1>🎙️ 娱乐直播竞品周报</h1>
   <div class="period">统计周期：{week_range}</div>
   <div class="hbadges">
-    <span class="hbadge">🤖 Claude Sonnet 4.6</span>
+    <span class="hbadge">🤖 Claude Haiku 4.5</span>
     <span class="hbadge">🔍 实时搜索增强</span>
     <span class="hbadge">📊 双赛道分析</span>
   </div>
@@ -284,7 +282,7 @@ body{{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHe
   </div>
 
   {sources_html}
-  <div class="footer">生成时间：{now}（北京时间）&nbsp;·&nbsp;由 Claude Sonnet 4.6 + Web Search 自动生成，重要信息请以官方来源为准</div>
+  <div class="footer">生成时间：{now}（北京时间）&nbsp;·&nbsp;由 Claude Haiku 4.5 + Web Search 自动生成，重要信息请以官方来源为准</div>
 </div>
 
 <script>
@@ -338,7 +336,6 @@ def parse_sections(text):
     if current and buf:
         sections[current] = '\n'.join(buf).strip()
 
-    # 如果解析失败，把全文放到 insights
     if not sections:
         sections['insights'] = text
     return sections
@@ -368,7 +365,6 @@ def render_section2(text):
     dims = ['礼物打赏', '会员订阅', '虚拟商品', '付费内容', '社交变现', '广告变现', '电商联动']
     dim_icons = ['🎁', '👑', '💎', '🔒', '💬', '📢', '🛒']
 
-    # 按平台分割
     platform_data = {}
     current_platform = None
     buf = []
@@ -377,7 +373,6 @@ def render_section2(text):
         line = line.strip()
         if not line:
             continue
-        # 检测平台名
         matched_platform = None
         for p in ALL_PLATFORMS:
             if p in line and ('**' in line or line.startswith(p)):
@@ -397,7 +392,6 @@ def render_section2(text):
     if not platform_data:
         return f'<div class="prose">{md_to_html(text)}</div>'
 
-    # 生成 Tab
     tabs_html = '<div class="platform-tabs">'
     blocks_html = ''
     for idx, (platform, content) in enumerate(platform_data.items()):
@@ -409,7 +403,6 @@ def render_section2(text):
 
         tabs_html += f'<button class="tab-btn {active}" data-target="{safe_id}">{platform}</button>'
 
-        # 提取各维度内容
         dims_html = '<div class="revenue-grid">'
         for dim, icon in zip(dims, dim_icons):
             dim_content = ''
@@ -427,7 +420,6 @@ def render_section2(text):
 </div>'''
         dims_html += '</div>'
 
-        # 提取公会政策
         policy_content = ''
         in_policy = False
         policy_lines = []
@@ -497,7 +489,6 @@ def render_section3(text):
 
         if cat_lines:
             for line in cat_lines[:8]:
-                # 提取平台名
                 platform_match = None
                 for p in ALL_PLATFORMS:
                     if p in line:
@@ -671,14 +662,14 @@ def update_index_page(docs_dir, week_num, week_range, filename):
         <p>娱乐直播 · 语音直播 · AI进展 · 每周自动更新</p>
         <div class="header-stats">
             <span class="stat">📚 共 {len(history)} 期报告</span>
-            <span class="stat">🤖 Claude Sonnet 4.6</span>
+            <span class="stat">🤖 Claude Haiku 4.5</span>
             <span class="stat">🔄 每周一自动更新</span>
         </div>
     </div>
     <div class="container">
         <div class="section-title">📋 历史报告归档</div>
         {history_items}
-        <div class="footer">由 Claude Sonnet 4.6 + Web Search 自动生成 · 每周一北京时间 09:00 更新</div>
+        <div class="footer">由 Claude Haiku 4.5 + Web Search 自动生成 · 每周一北京时间 07:00 更新</div>
     </div>
 </body>
 </html>"""
@@ -716,6 +707,9 @@ def generate_report():
 语音直播平台：{voice_str}
 
 ---
+⚠️ 严格要求：必须输出完整5个章节，每章节前必须有对应的SECTION_标记行。
+任何平台数据缺失时填"暂无公开数据"，不得省略章节或平台。
+
 请严格按以下5个章节输出，每章节前必须输出对应的章节标记行：
 
 SECTION_INSIGHTS
@@ -759,7 +753,7 @@ SECTION_FORECAST
 输出要求：语言专业简洁，重要数据加粗，适合企业内部阅读。"""
 
     response = client.messages.create(
-        model="claude-sonnet-4-6",
+        model="claude-haiku-4-5-20251001",
         max_tokens=8000,
         tools=[{"type": "web_search_20250305", "name": "web_search"}],
         messages=[{"role": "user", "content": prompt}]
@@ -773,7 +767,6 @@ SECTION_FORECAST
     report_text = clean_text(report_text)
     print(f"✅ 报告生成完成，共 {len(report_text)} 字")
 
-    # 提取来源链接
     sources = []
     for title, uri in re.findall(r'\[([^\]]+)\]\((https?://[^\)]+)\)', report_text):
         if len(title) > 5:
@@ -846,7 +839,7 @@ def send_to_feishu(summary, week_num, week_range, sources, report_url, index_url
     elements.append({
         "tag": "note",
         "elements": [{"tag": "plain_text",
-            "content": f"🤖 Claude Sonnet 4.6 + Web Search 实时生成 · {now_beijing} (北京时间)"}]
+            "content": f"🤖 Claude Haiku 4.5 + Web Search 实时生成 · {now_beijing} (北京时间)"}]
     })
 
     payload = {
@@ -864,7 +857,7 @@ def send_to_feishu(summary, week_num, week_range, sources, report_url, index_url
 
 
 def main():
-    print("🚀 开始生成娱乐直播竞品周报（Claude Sonnet 4.6）...")
+    print("🚀 开始生成娱乐直播竞品周报（Claude Haiku 4.5）...")
     report_text, week_num, week_range, sources, report_url, index_url = generate_report()
     print(f"📎 本期报告：{report_url}")
     print(f"📚 历史归档：{index_url}")
