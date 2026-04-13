@@ -211,7 +211,7 @@ body{{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHe
   <h1>🎙️ 娱乐直播竞品周报</h1>
   <div class="period">统计周期：{week_range}</div>
   <div class="hbadges">
-    <span class="hbadge">🤖 Claude Haiku 4.5</span>
+    <span class="hbadge">🤖 Claude Sonnet 4.6</span>
     <span class="hbadge">🔍 实时搜索增强</span>
     <span class="hbadge">📊 双赛道分析</span>
   </div>
@@ -282,7 +282,7 @@ body{{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHe
   </div>
 
   {sources_html}
-  <div class="footer">生成时间：{now}（北京时间）&nbsp;·&nbsp;由 Claude Haiku 4.5 + Web Search 自动生成，重要信息请以官方来源为准</div>
+  <div class="footer">生成时间：{now}（北京时间）&nbsp;·&nbsp;由 Claude Sonnet 4.6 + Web Search 自动生成，重要信息请以官方来源为准</div>
 </div>
 
 <script>
@@ -662,14 +662,14 @@ def update_index_page(docs_dir, week_num, week_range, filename):
         <p>娱乐直播 · 语音直播 · AI进展 · 每周自动更新</p>
         <div class="header-stats">
             <span class="stat">📚 共 {len(history)} 期报告</span>
-            <span class="stat">🤖 Claude Haiku 4.5</span>
+            <span class="stat">🤖 Claude Sonnet 4.6</span>
             <span class="stat">🔄 每周一自动更新</span>
         </div>
     </div>
     <div class="container">
         <div class="section-title">📋 历史报告归档</div>
         {history_items}
-        <div class="footer">由 Claude Haiku 4.5 + Web Search 自动生成 · 每周一北京时间 07:00 更新</div>
+        <div class="footer">由 Claude Sonnet 4.6 + Web Search 自动生成 · 每周一北京时间 07:00 更新</div>
     </div>
 </body>
 </html>"""
@@ -753,7 +753,7 @@ SECTION_FORECAST
 输出要求：语言专业简洁，重要数据加粗，适合企业内部阅读。"""
 
     response = client.messages.create(
-        model="claude-haiku-4-5-20251001",
+        model="claude-sonnet-4-6",
         max_tokens=8000,
         tools=[{"type": "web_search_20250305", "name": "web_search"}],
         messages=[{"role": "user", "content": prompt}]
@@ -839,7 +839,7 @@ def send_to_feishu(summary, week_num, week_range, sources, report_url, index_url
     elements.append({
         "tag": "note",
         "elements": [{"tag": "plain_text",
-            "content": f"🤖 Claude Haiku 4.5 + Web Search 实时生成 · {now_beijing} (北京时间)"}]
+            "content": f"🤖 Claude Sonnet 4.6 + Web Search 实时生成 · {now_beijing} (北京时间)"}]
     })
 
     payload = {
@@ -857,7 +857,7 @@ def send_to_feishu(summary, week_num, week_range, sources, report_url, index_url
 
 
 def main():
-    print("🚀 开始生成娱乐直播竞品周报（Claude Haiku 4.5）...")
+    print("🚀 开始生成娱乐直播竞品周报（Claude Sonnet 4.6）...")
     report_text, week_num, week_range, sources, report_url, index_url = generate_report()
     print(f"📎 本期报告：{report_url}")
     print(f"📚 历史归档：{index_url}")
