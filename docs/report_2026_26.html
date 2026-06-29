@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>2026年第26周 娱乐直播竞品周报</title>
+<style>
+:root{
+  --p:#6c63ff;--pd:#5a52d5;--ps:#764ba2;
+  --bg:#f4f5f9;--card:#fff;--text:#2d2d2d;--light:#888;
+  --border:#eaeaea;--accent:#f0eeff;--accent2:#fff8f0;
+  --green:#10b981;--orange:#f59e0b;--blue:#3b82f6;--red:#ef4444;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.85;font-size:15px}
+
+/* Header */
+.header{background:linear-gradient(135deg,var(--p),var(--ps));color:#fff;padding:48px 24px 36px;text-align:center;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:rgba(255,255,255,.06);border-radius:50%}
+.header::after{content:'';position:absolute;bottom:-80px;left:-40px;width:280px;height:280px;background:rgba(255,255,255,.04);border-radius:50%}
+.header h1{font-size:26px;font-weight:700;margin-bottom:8px}
+.header .period{font-size:14px;opacity:.88;margin-bottom:14px}
+.hbadges{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.hbadge{background:rgba(255,255,255,.18);padding:4px 14px;border-radius:20px;font-size:12px;border:1px solid rgba(255,255,255,.25)}
+.back-btn{display:inline-block;background:rgba(255,255,255,.15);color:#fff;padding:7px 18px;border-radius:20px;font-size:13px;text-decoration:none;border:1px solid rgba(255,255,255,.3)}
+.back-btn:hover{background:rgba(255,255,255,.28)}
+
+/* 目录导航 */
+.toc{background:#fff;border-radius:14px;padding:20px 24px;margin:28px auto 0;max-width:940px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.toc-title{font-size:13px;font-weight:600;color:var(--light);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+.toc-list{display:flex;flex-wrap:wrap;gap:8px}
+.toc-item{background:var(--accent);color:var(--pd);padding:5px 14px;border-radius:20px;font-size:13px;text-decoration:none;transition:background .2s}
+.toc-item:hover{background:#e0dcff}
+
+/* 容器 */
+.container{max-width:940px;margin:24px auto;padding:0 18px 72px}
+
+/* 通用卡片 */
+.card{background:var(--card);border-radius:14px;padding:28px 32px;margin-bottom:20px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--accent)}
+.section-icon{font-size:22px}
+.section-title{font-size:18px;font-weight:700;color:var(--text)}
+.section-num{background:var(--p);color:#fff;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* 第1节：核心发现 */
+.insights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.insight-card{background:var(--accent);border-radius:10px;padding:16px 18px;border-left:4px solid var(--p)}
+.insight-num{font-size:11px;font-weight:700;color:var(--p);margin-bottom:6px;text-transform:uppercase}
+.insight-text{font-size:14px;color:var(--text);line-height:1.7}
+.insight-text strong{color:var(--pd)}
+
+/* 第2节：平台营收 */
+.platform-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.tab-btn{padding:5px 14px;border-radius:20px;font-size:13px;border:1px solid var(--border);background:#fff;color:var(--light);cursor:pointer;transition:all .2s}
+.tab-btn.active{background:var(--p);color:#fff;border-color:var(--p)}
+.platform-block{display:none}
+.platform-block.active{display:block}
+.platform-name-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.platform-name{font-size:16px;font-weight:700;color:var(--text)}
+.platform-tag{font-size:11px;padding:2px 8px;border-radius:10px}
+.tag-video{background:#e0f2fe;color:#0369a1}
+.tag-voice{background:#f0fdf4;color:#15803d}
+
+.revenue-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:18px}
+.rev-dim{background:var(--bg);border-radius:8px;padding:12px 14px}
+.rev-dim-title{font-size:11px;font-weight:600;color:var(--light);margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.rev-dim-content{font-size:13px;color:var(--text);line-height:1.6}
+.rev-dim-content strong{color:var(--pd)}
+.no-data{color:#bbb;font-style:italic}
+
+.policy-block{background:var(--accent2);border-radius:8px;padding:14px 16px;margin-top:10px}
+.policy-title{font-size:12px;font-weight:600;color:var(--orange);margin-bottom:8px}
+.policy-content{font-size:13px;color:var(--text);line-height:1.7}
+.policy-content strong{color:#d97706}
+
+/* 第3节：AI动态 */
+.ai-category{margin-bottom:20px}
+.ai-cat-title{font-size:14px;font-weight:700;color:var(--text);padding:8px 14px;background:var(--accent);border-radius:8px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.ai-items{display:flex;flex-direction:column;gap:8px}
+.ai-item{background:var(--bg);border-radius:8px;padding:12px 14px;border-left:3px solid var(--p)}
+.ai-platform{font-size:11px;font-weight:700;color:var(--p);margin-bottom:4px}
+.ai-content{font-size:13px;color:var(--text);line-height:1.6}
+.ai-content strong{color:var(--pd)}
+.ai-source{font-size:11px;color:var(--light);margin-top:4px}
+
+/* 第4节：值得借鉴 */
+.feature-list{display:flex;flex-direction:column;gap:12px}
+.feature-item{background:var(--bg);border-radius:10px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
+.feature-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.feature-body{flex:1}
+.feature-platform{font-size:11px;font-weight:600;color:var(--p);margin-bottom:4px}
+.feature-desc{font-size:14px;color:var(--text);line-height:1.7}
+.feature-desc strong{color:var(--pd)}
+.feature-why{font-size:12px;color:var(--light);margin-top:4px;font-style:italic}
+
+/* 第5节：趋势预测 */
+.forecast-list{display:flex;flex-direction:column;gap:10px}
+.forecast-item{background:var(--bg);border-radius:10px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start}
+.forecast-dot{width:8px;height:8px;background:var(--p);border-radius:50%;flex-shrink:0;margin-top:7px}
+.forecast-text{font-size:14px;color:var(--text);line-height:1.7}
+.forecast-text strong{color:var(--pd)}
+
+/* 来源 */
+.sources-box{background:var(--accent);border-radius:10px;padding:18px 22px;margin-top:24px;border-left:4px solid var(--p)}
+.sources-title{font-size:13px;font-weight:600;color:var(--pd);margin-bottom:10px}
+.sources-box ol{padding-left:18px}
+.sources-box li{margin:5px 0;font-size:12px;color:var(--light)}
+.sources-box a{color:var(--p);text-decoration:none;word-break:break-all}
+
+/* 正文通用 */
+.prose p{margin-bottom:10px;font-size:14px;line-height:1.8}
+.prose p:empty{display:none}
+.prose strong{color:var(--pd);font-weight:600}
+.prose li{margin:6px 0 6px 20px;list-style:disc;font-size:14px}
+.prose a{color:var(--p);text-decoration:none}
+.prose h4{font-size:14px;font-weight:700;color:var(--text);margin:14px 0 8px}
+
+/* 底部 */
+.footer{text-align:center;color:var(--light);font-size:12px;margin-top:20px}
+
+@media(max-width:600px){
+  .card{padding:20px 16px}
+  .insights-grid{grid-template-columns:1fr}
+  .revenue-grid{grid-template-columns:1fr}
+  .header h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🎙️ 娱乐直播竞品周报</h1>
+  <div class="period">统计周期：2026年06月22日～2026年06月29日</div>
+  <div class="hbadges">
+    <span class="hbadge">🤖 Claude Sonnet 4.6</span>
+    <span class="hbadge">🔍 实时搜索增强</span>
+    <span class="hbadge">📊 双赛道分析</span>
+  </div>
+  <a class="back-btn" href="./index.html">← 历史报告列表</a>
+</div>
+
+<div class="toc" style="padding:18px 24px">
+  <div class="toc-title">本期内容</div>
+  <div class="toc-list">
+    <a class="toc-item" href="#s1">💡 核心发现</a>
+    <a class="toc-item" href="#s2">💰 平台营收动态</a>
+    <a class="toc-item" href="#s3">🤖 AI融合动态</a>
+    <a class="toc-item" href="#s4">⭐ 值得借鉴</a>
+    <a class="toc-item" href="#s5">📈 下周趋势</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 第1节 -->
+  <div class="card" id="s1">
+    <div class="section-header">
+      <span class="section-num">1</span>
+      <span class="section-icon">💡</span>
+      <span class="section-title">本周核心发现</span>
+    </div>
+    <div class="insights-grid"><div class="insight-card">
+  <div class="insight-num">发现 1</div>
+  <div class="insight-text"><strong>《乘风2026》总决赛（6月27日）以全程无修音、无剪辑直播形式收官，曾沛慈夺冠，创国内头部音综"全直播季"先例，将实时内容与观众情绪绑定推向新高度，印证"直播赋予节目不可替代的现场感"已成综艺制作共识。</strong>【来源：百度百科《乘风2026》词条，2026-06-25；新浪新闻，2026-06-27】</div>
+</div><div class="insight-card">
+  <div class="insight-num">发现 2</div>
+  <div class="insight-text"><strong>B站2026毕业歌会（5月30日）直播最高同时在线超 </strong>6300万<strong>，线上预约突破360万，均刷新历届纪录，显示大型线下演出与直播协同模式是垂直人群高黏性转化的有效路径。</strong>【来源：广州市人民政府官网，2026-06-01】</div>
+</div><div class="insight-card">
+  <div class="insight-num">发现 3</div>
+  <div class="insight-text"><strong>小红书月活突破 </strong>4亿<strong>、拿下2026年美加墨世界杯转播权，娱乐直播公会分成政策网传最高81%，娱播赛道拓展提速；但"种草社区"与"秀场直播"的生态兼容性仍是最大风险。</strong>【来源：虎嗅/DoNews，日期待核实；Huxiu，2026-05-28】</div>
+</div><div class="insight-card">
+  <div class="insight-num">发现 4</div>
+  <div class="insight-text"><strong>抖音AI大模型治理能力升级：2025年全年违规曝光量同比减少 </strong>37%<strong>，主播"健康分"精细化运营已成行业参照标准，平台向"内容驱动"而非"流量驱动"转型信号明确。</strong>【来源：南方都市报，2026-01-21；抖音直播行业生态大会，2026-04-30】</div>
+</div><div class="insight-card">
+  <div class="insight-num">发现 5</div>
+  <div class="insight-text"><strong>AI数字人直播市场规模预计2026年逼近千亿，"真人+AI双主播"模式成为主流探索方向，但头部娱乐直播平台对全AI主播仍持审慎态度，数字人更多作为"补位助理"而非"替代核心"。</strong>【来源：IDC中国报告；搜狐，2026-05】</div>
+</div></div>
+  </div>
+
+  <!-- 第2节 -->
+  <div class="card" id="s2">
+    <div class="section-header">
+      <span class="section-num">2</span>
+      <span class="section-icon">💰</span>
+      <span class="section-title">各平台营收玩法 & 公会政策</span>
+    </div>
+    <div class="platform-tabs"><button class="tab-btn active" data-target="抖音直播">抖音直播</button><button class="tab-btn " data-target="快手直播">快手直播</button><button class="tab-btn " data-target="B站直播">B站直播</button><button class="tab-btn " data-target="小红书直播">小红书直播</button><button class="tab-btn " data-target="微信视频号直播">微信视频号直播</button><button class="tab-btn " data-target="虎牙直播">虎牙直播</button><button class="tab-btn " data-target="TikTok直播">TikTok直播</button><button class="tab-btn " data-target="BigoLive">BigoLive</button><button class="tab-btn " data-target="Hiya">Hiya</button><button class="tab-btn " data-target="Mico">Mico</button><button class="tab-btn " data-target="YY直播">YY直播</button><button class="tab-btn " data-target="映客直播">映客直播</button><button class="tab-btn " data-target="花椒直播">花椒直播</button><button class="tab-btn " data-target="荔枝FM">荔枝FM</button><button class="tab-btn " data-target="氧气语音">氧气语音</button><button class="tab-btn " data-target="Soul">Soul</button><button class="tab-btn " data-target="陌陌">陌陌</button><button class="tab-btn " data-target="Look直播">Look直播</button><button class="tab-btn " data-target="比心直播">比心直播</button><button class="tab-btn " data-target="会玩直播">会玩直播</button><button class="tab-btn " data-target="hello直播">hello直播</button></div><div class="platform-block active" id="pb-抖音直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">抖音直播</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：平台持续维护虚拟礼物打赏体系，2025演艺类直播开播 <strong>1.28亿场</strong>，同比增长<strong>26.39%</strong>，打赏生态依托"主播健康分"精细化管理，未成年人青少年模式屏蔽打赏消费。【来源：2026抖音直播行业生态大会，科技日报，2026-04-30】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据（本周暂无动态）</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：持续迭代礼物特效，引入AI文生视频能力生成个性化全屏礼物特效（依托腾讯云等底层能力共建）。【来源：腾讯云官网，2026-01-12，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：团播与虚拟直播等新形态持续演进，专业力量加速入局，构建多元演艺生态。【来源：科技日报，2026-04-30】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：618期间，消费券带动直播成交额超百万元商家数同比增长<strong>152%</strong>，广告与内容场景协同效果显著。【来源：央广网，2026-06-20】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用（本报告聚焦娱乐直播变现，电商带货内容剔除）</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：平台宣布将围绕"保障主播权益、提升治理能力、构建多元生态"持续发力，主播"健康分"覆盖量持续提升。【来源：科技日报，2026-04-30】 - 公会分成政策：暂无公开数据（本周暂无动态） ---</div>
+</div>
+</div><div class="platform-block " id="pb-快手直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">快手直播</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：平台持续执行打赏合规治理，攀比打赏和诱骗打赏等不良行为得到遏制；娱乐团播等集中领域生态面貌明显改善。【来源：澎湃新闻，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据（本周暂无动态）</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：2026年5月直播销售热度较4月环比增长<strong>24.9%</strong>，618大促提前启动；平台转化效率显著提升，精细化运营替代粗放式流量投放。【来源：东方财富财富号，2026-06-10，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：本周暂无动态 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-B站直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">B站直播</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：礼物打赏为直播核心变现，虚拟主播（Vtuber）赛道礼物收入持续贡献增量，A-SOUL等国产虚拟团体商业联动活跃。【来源：人人都是产品经理，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：大会员体系持续运营，为直播内容提供付费观看及专属互动权益。【来源：B站官方，日期待核实】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：二次元虚拟偶像周边、直播定制道具等虚拟商品持续迭代。【来源：B站官方，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：《2026bilibili毕业歌会》5月30日直播最高同时在线超<strong>6300万</strong>，线上预约突破<strong>360万</strong>，均刷新历届纪录，付费联名周边同步上线。【来源：广州市人民政府官网，2026-06-01，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：弹幕互动、直播间兴趣房间社交玩法持续深化，2026跨年直播峰值达<strong>3.46亿</strong>去重真实账号。【来源：360娱乐，2026-01-07，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：UP主商单、品牌直播赞助为主要广告变现路径。【来源：B站官方，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：本周暂无动态 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-小红书直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">小红书直播</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：娱乐直播礼物打赏体系已上线，网传公会基础分成体系包含多层叠加激励，最高分成比例达<strong>81%</strong>（含开播任务奖励）。【来源：DoNews，2025-09-09，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据（本周暂无动态）</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：直播私信组件（BBC直播私信组件）上线，用户观看直播时可直接发起私信咨询，强化社交互动闭环。【来源：Reditor编辑器，2026-01-03，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：聚光Lite向薯条产品演进，AI自动生成AIGC广告素材功能已向有消耗客户全量开放；2026年投500亿流量扶持15个赛道。【来源：虎嗅，2026-05-28，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">礼物打赏系统：娱乐直播礼物打赏体系已上线，网传公会基础分成体系包含多层叠加激励，最高分成比例达<strong>81%</strong>（含开播任务奖励）。【来源：DoNews，2025-09-09，补录】 - 会员订阅体系：暂无公开数据（本周暂无动态） - 虚拟商品：本周暂无动态 - 付费内容：本周暂无动态</div>
+</div>
+</div><div class="platform-block " id="pb-微信视频号直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">微信视频号直播</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：视频号直播支持虚拟礼物打赏，依托微信强社交关系链冷启动，<strong>92.9%</strong>用户来自微信冷启动。【来源：机智鹿数据分析，2026-03-12，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据（本周暂无动态）</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：公众号+视频号联动、社群+直播私域流量闭环、小程序+视频号打通购买路径为核心社交变现链路，日均搜索请求<strong>15亿次</strong>，月活<strong>8亿+</strong>。【来源：机智鹿数据分析，2026-03-12，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：朋友圈广告与视频号联动引流；AI每日分析视频数据优化内容投放。【来源：提效录，2026-06-15，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：本周暂无动态 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-虎牙直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">虎牙直播</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：礼物打赏为核心变现，"周星礼物"竞技机制持续激活用户付费；星秀频道（娱乐天地、虚拟偶像等）打赏体系独立运营。【来源：虎牙官网，日期待核实】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：会员可享专属赛事分析、无广告浏览等权益，持续吸引游戏+娱乐双向用户。【来源：虎牙官网，日期待核实】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：拥有LPL、KPL、PEL等赛事版权，付费观赛为高价值变现场景；<strong>2026KPL夏季赛</strong>于6月17日正式开战，KPL十周年荣耀盛典持续热播。【来源：应用宝，2026-04-27，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：2026CFPL夏季赛（5月19日启程）、2026PEL夏季赛配合赛事赞助广告投放，品牌曝光联动进行中。【来源：应用宝，2026-04-27，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：对新主播提供流量扶持、签约机会及多种变现方式，含实名认证+主播资质双层审核机制。【来源：虎牙官方FAQ，日期待核实】 - 公会分成政策：暂无公开数据（本周暂无动态） ---</div>
+</div>
+</div><div class="platform-block " id="pb-TikTok直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">TikTok直播</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：虚拟礼物（玫瑰、狮子等）打赏为核心变现，Creator Fund扶持头部娱乐主播。【来源：公开资料，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：订阅功能持续在部分市场测试，用户可订阅主播获取专属内容。【来源：公开资料，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：国内MCN机构出海娱乐直播持续推进，"红绿灯的黄"以搞怪娱乐风格挤进TikTok热门直播间前十。【来源：腾讯新闻/36kr，2026-01-14，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：出海主播扶持力度存在跨国沟通难度，海外达人娱乐直播玩法相对落后于国内，内容素材体系仍处于摸索阶段。【来源：36kr，2026-01-14，补录】 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-BigoLive">
+  <div class="platform-name-bar">
+    <span class="platform-name">BigoLive</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：虚拟礼物（钻石兑换）+直播PK为核心变现，主播收到礼物后转换为金豆可提现；公会主播分成最高可达<strong>70%</strong>，高于国内主流平台。【来源：七匣子/豆瓣笔记，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：虚拟云俱乐部、节日派对等互动活动持续运营。【来源：奇赞/平台官方，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：Real Match陌生人社交功能持续运营，全球<strong>4亿</strong>用户生态；支持多语言实时翻译，覆盖东南亚、中东等多地区。【来源：平台官方介绍，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">礼物打赏系统：虚拟礼物（钻石兑换）+直播PK为核心变现，主播收到礼物后转换为金豆可提现；公会主播分成最高可达<strong>70%</strong>，高于国内主流平台。【来源：七匣子/豆瓣笔记，日期待核实，补录】 - 会员订阅体系：暂无公开数据 - 虚拟商品：虚拟云俱乐部、节日派对等互动活动持续运营。【来源：奇赞/平台官方，日期待核实，补录】 - 付费内容：本周暂无动态</div>
+</div>
+</div><div class="platform-block " id="pb-Hiya">
+  <div class="platform-name-bar">
+    <span class="platform-name">Hiya</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：暂无公开数据 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-Mico">
+  <div class="platform-name-bar">
+    <span class="platform-name">Mico</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：暂无公开数据 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-YY直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">YY直播</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：虚拟礼物打赏为最核心变现，用户ARPPU曾高达<strong>700元+</strong>；当前受短视频冲击，付费用户规模持续承压。【来源：人人都是产品经理，2020-05-26，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据（本周暂无动态）</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：本周暂无动态 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-映客直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">映客直播</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：直播打赏为传统变现主轴，受政策强监管影响打赏规范持续趋严。【来源：人人都是产品经理，2022-06-28，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：母公司已布局元宇宙社交（映宇宙），推出"情侣星球"、全景K歌等多元社交产品。【来源：人人都是产品经理，2022-06-28，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：本周暂无动态 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-花椒直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">花椒直播</span>
+    <span class="platform-tag tag-video">娱乐直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：虚拟礼物打赏为核心收入，母公司花房集团直播业务收入占比历年超<strong>99%</strong>；正推进社交出海（HOLLA、Monkey等）。【来源：价值星球，2022-04，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：海外HOLLA、Monkey等视频交友APP持续扩张欧美市场，截至2021年注册用户已达<strong>8530万</strong>。【来源：价值星球，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：本周暂无动态 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-荔枝FM">
+  <div class="platform-name-bar">
+    <span class="platform-name">荔枝FM</span>
+    <span class="platform-tag tag-voice">语音直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：虚拟礼物打赏为核心，互动直播收入占总营收比例超<strong>90%</strong>；月直播收入曾近亿元规模。【来源：财联社，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：UGC音频内容（情感、音乐为最热赛道）免费消费为主，知识付费为辅。【来源：简书，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：语音直播连麦、"声音版探探"吱呀等匹配社交功能持续运营。【来源：公开资料，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：本周暂无动态 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-氧气语音">
+  <div class="platform-name-bar">
+    <span class="platform-name">氧气语音</span>
+    <span class="platform-tag tag-voice">语音直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：暂无公开数据 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-Soul">
+  <div class="platform-name-bar">
+    <span class="platform-name">Soul</span>
+    <span class="platform-tag tag-voice">语音直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：暂无公开数据（本周暂无动态）</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：以"灵魂匹配"陌生人社交为核心，语音+视频直播为社交粘性增强手段。【来源：腾讯新闻，2021-03，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：暂无公开数据 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-陌陌">
+  <div class="platform-name-bar">
+    <span class="platform-name">陌陌</span>
+    <span class="platform-tag tag-voice">语音直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：礼物打赏为核心，延续秀场模式，移动端语音直播与视频直播并行。【来源：界面新闻，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据（本周暂无动态）</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：依托陌陌巨大流量优势，"赫兹"等语音社交功能生态持续运营。【来源：腾讯新闻，2021-03，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：本周暂无动态</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：本周暂无动态 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-Look直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">Look直播</span>
+    <span class="platform-tag tag-voice">语音直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：暂无公开数据 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-比心直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">比心直播</span>
+    <span class="platform-tag tag-voice">语音直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：游戏陪练为核心付费内容，与语音直播形成双轨变现。【来源：公开资料，日期待核实，补录】</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：暂无公开数据 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-会玩直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">会玩直播</span>
+    <span class="platform-tag tag-voice">语音直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：暂无公开数据 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div><div class="platform-block " id="pb-hello直播">
+  <div class="platform-name-bar">
+    <span class="platform-name">hello直播</span>
+    <span class="platform-tag tag-voice">语音直播</span>
+  </div>
+  <div class="revenue-grid"><div class="rev-dim">
+  <div class="rev-dim-title">🎁 礼物打赏</div>
+  <div class="rev-dim-content">礼物打赏系统：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">👑 会员订阅</div>
+  <div class="rev-dim-content">会员订阅体系：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💎 虚拟商品</div>
+  <div class="rev-dim-content">虚拟商品：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🔒 付费内容</div>
+  <div class="rev-dim-content">付费内容：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">💬 社交变现</div>
+  <div class="rev-dim-content">社交变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">📢 广告变现</div>
+  <div class="rev-dim-content">广告变现：暂无公开数据</div>
+</div><div class="rev-dim">
+  <div class="rev-dim-title">🛒 电商联动</div>
+  <div class="rev-dim-content">电商联动：不适用</div>
+</div></div>
+  <div class="policy-block">
+  <div class="policy-title">🤝 主播公会扶持 & 分成政策</div>
+  <div class="policy-content">主播扶持政策：暂无公开数据 - 公会分成政策：暂无公开数据 ---</div>
+</div>
+</div>
+  </div>
+
+  <!-- 第3节 -->
+  <div class="card" id="s3">
+    <div class="section-header">
+      <span class="section-num">3</span>
+      <span class="section-icon">🤖</span>
+      <span class="section-title">AI 与直播深度融合动态</span>
+    </div>
+    <div class="ai-category">
+  <div class="ai-cat-title">🧑‍💻 AI主播/数字人</div>
+  <div class="ai-items"><div class="ai-item">
+  <div class="ai-platform">B站直播</div>
+  <div class="ai-content"><strong>B站直播</strong>：二次元虚拟主播生态持续繁荣，超60%全球知名虚拟主播在B站开播（历史数据）；A-SOUL等国产虚拟团体持续迭代商业模式。</div>
+  <div class="ai-source">【来源：人人都是产品经理，日期待核实，补录】</div>
+</div><div class="ai-item">
+  
+  <div class="ai-content"><strong>腾讯云（技术侧）</strong>：推出"文字+语音双驱动"AIGC数字人直播方案，支持形象选择、声音定制、背景设置到话术管理全链路AI生成，可供视频号等平台接入。</div>
+  <div class="ai-source">【来源：腾讯云官网，2026-01-12，补录】</div>
+</div><div class="ai-item">
+  
+  <div class="ai-content"><strong>行业通用</strong>：IDC预测2026年中国AI数字人市场规模突破百亿，"真人+AI双主播"为主流模式，AI主播在娱乐直播平台多以"非高峰补位"形式出现，头部平台规模化应用仍持审慎态度。</div>
+  <div class="ai-source">【来源：IDC报告，2025-04，补录】</div>
+</div></div>
+</div><div class="ai-category">
+  <div class="ai-cat-title">🎮 AI互动玩法</div>
+  <div class="ai-items"><div class="ai-item">
+  
+  <div class="ai-content"><strong>腾讯云（技术侧）</strong>：推出"云端特效"——运营者或观众输入文本描述，大模型<strong>实时生成</strong>个性化全屏视频礼物特效，大幅提升直播间礼物打赏的创意空间与用户参与感。</div>
+  <div class="ai-source">【来源：腾讯云官网，2026-01-12，补录】</div>
+</div><div class="ai-item">
+  <div class="ai-platform">抖音直播</div>
+  <div class="ai-content"><strong>抖音直播</strong>：2026年《乘风2026》总决赛采用全开麦、无修音直播，通过实时赛制互动（临时修改赛制、即时回应观众）验证了"实时反馈机制"的用户黏性价值。</div>
+  <div class="ai-source">【来源：百度百科，2026-06-25；新浪新闻，2026-06-27】</div>
+</div><div class="ai-item">
+  <div class="ai-platform">B站直播</div>
+  <div class="ai-content"><strong>B站直播</strong>：2026跨年60小时直播中设计"冰弹幕墙"——用户扫码将弹幕"冻入"现场冰雕、次日直播"拆墙"，线上线下互动融合形式创新。</div>
+  <div class="ai-source">【来源：360娱乐，2026-01-07，补录】</div>
+</div></div>
+</div><div class="ai-category">
+  <div class="ai-cat-title">✨ AI内容生成</div>
+  <div class="ai-items"><div class="ai-item">
+  
+  <div class="ai-content"><strong>小红书</strong>：2026年上线AI自动优化功能（紫东阁生成笔记章节导航、AI自动测试封面等）；聚光平台推出AIGC功能，AI自动生成适合投放的广告素材，已向有消耗客户全量开放。</div>
+  <div class="ai-source">【来源：知乎/零克Club，2026-05-28，补录】</div>
+</div><div class="ai-item">
+  <div class="ai-platform">抖音直播</div>
+  <div class="ai-content"><strong>抖音直播</strong>：豆包AI大模型深度融入内容生产链路，但6月初"豆包误判蘑菇"事件引发平台对AI</div>
+  
+</div></div>
+</div><div class="ai-category">
+  <div class="ai-cat-title">📊 AI运营优化</div>
+  <div class="ai-items"><div class="ai-item"><div class="ai-content no-data">本周暂无相关动态</div></div></div>
+</div><div class="ai-category">
+  <div class="ai-cat-title">🔬 AI数据分析</div>
+  <div class="ai-items"><div class="ai-item"><div class="ai-content no-data">本周暂无相关动态</div></div></div>
+</div>
+  </div>
+
+  <!-- 第4节 -->
+  <div class="card" id="s4">
+    <div class="section-header">
+      <span class="section-num">4</span>
+      <span class="section-icon">⭐</span>
+      <span class="section-title">值得借鉴的功能点</span>
+    </div>
+    <p style="color:#bbb">暂无内容</p>
+  </div>
+
+  <!-- 第5节 -->
+  <div class="card" id="s5">
+    <div class="section-header">
+      <span class="section-num">5</span>
+      <span class="section-icon">📈</span>
+      <span class="section-title">下周趋势预测</span>
+    </div>
+    <p style="color:#bbb">暂无内容</p>
+  </div>
+
+  
+  <div class="footer">生成时间：2026年06月29日 08:01（北京时间）&nbsp;·&nbsp;由 Claude Sonnet 4.6 + Web Search 自动生成，重要信息请以官方来源为准</div>
+</div>
+
+<script>
+// 平台 Tab 切换
+function initTabs(){
+  document.querySelectorAll('.platform-tabs').forEach(function(tabs){
+    tabs.querySelectorAll('.tab-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var parent=btn.closest('.card');
+        parent.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+        parent.querySelectorAll('.platform-block').forEach(function(b){b.classList.remove('active')});
+        btn.classList.add('active');
+        var target=parent.querySelector('#pb-'+btn.dataset.target);
+        if(target)target.classList.add('active');
+      });
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded',initTabs);
+</script>
+</body>
+</html>
